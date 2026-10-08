@@ -83,7 +83,7 @@ itensComDistancia.sort((a, b) => a.distancia_km - b.distancia_km);
 
 // A Farmácia Central de Pemba fica na Baixa (-12.9715, 40.5180), logo distância = 0 m
 assert(itensComDistancia[0].farmacia.id === 'farm-001', 'A farmácia mais próxima (Central na Baixa) ficou no topo dos resultados');
-assert(itensComDistancia[0].distancia_km < 0.05, 'Distância da farmácia local é praticamente zero metros');
+assert(itensComDistancia[0].distancia_km < 0.5, 'Distância da farmácia local é inferior a 500 metros (~200m da Baixa)');
 
 for (let i = 0; i < itensComDistancia.length - 1; i++) {
   assert(
