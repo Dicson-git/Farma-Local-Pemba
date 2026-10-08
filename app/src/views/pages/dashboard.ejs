@@ -1,0 +1,484 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="main-wrapper">
+  <!-- Cabeçalho do Painel da Farmácia -->
+  <div class="dashboard-header">
+    <div class="dash-pharmacy-info">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <h1><%= farmacia.nome %></h1>
+        <span class="stock-badge stock-badge-high" style="font-size:0.75rem;">
+          <svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Farmácia Activa
+        </span>
+      </div>
+      <p style="margin-top:4px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+        <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        <%= farmacia.bairro %>, <%= farmacia.cidade %> • GPS: <code><%= farmacia.latitude.toFixed(6) %>, <%= farmacia.longitude.toFixed(6) %></code> • Telefone: <strong><%= farmacia.telefone %></strong>
+      </p>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <button type="button" class="nav-btn nav-btn-outline" onclick="document.getElementById('editPharmacyModal').style.display='flex'">
+        <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        <span>Editar Dados & Localização</span>
+      </button>
+      <button type="button" class="btn-gps-action" onclick="document.getElementById('addMedicineModal').style.display='flex'">
+        <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span>Adicionar Novo Medicamento</span>
+      </button>
+    </div>
+  </div>
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+      <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <span>Operação realizada com sucesso no inventário!</span>
+    </div>
+  <% } %>
+
+  <% if (typeof welcome !== 'undefined' && welcome) { %>
+    <div class="alert alert-success">
+      <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <span>Bem-vindo ao FarmaLocal! O seu estabelecimento já está registado com localização GPS ativa. Cadastre os medicamentos disponíveis para aparecer nas buscas de pacientes.</span>
+    </div>
+  <% } %>
+
+  <!-- Estatísticas Rápidas de Balcão -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:24px;">
+    <div style="background:white; padding:18px; border-radius:12px; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm);">
+      <span style="font-size:0.78rem; text-transform:uppercase; color:#64748B; font-weight:700;">Total de Fármacos</span>
+      <div style="font-size:1.8rem; font-weight:800; font-family:var(--font-heading); color:#0F172A; margin-top:4px;">
+        <%= medicamentos.length %>
+      </div>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm);">
+      <span style="font-size:0.78rem; text-transform:uppercase; color:#166534; font-weight:700;">Em Stock Activo (> 0)</span>
+      <div style="font-size:1.8rem; font-weight:800; font-family:var(--font-heading); color:#166534; margin-top:4px;">
+        <%= medicamentos.filter(m => m.quantidade_stock > 0).length %>
+      </div>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm);">
+      <span style="font-size:0.78rem; text-transform:uppercase; color:#991B1B; font-weight:700;">Esgotados (Ocultos nas Buscas)</span>
+      <div style="font-size:1.8rem; font-weight:800; font-family:var(--font-heading); color:#991B1B; margin-top:4px;">
+        <%= medicamentos.filter(m => m.quantidade_stock === 0).length %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela de Medicamentos -->
+  <section>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h2 style="font-family:var(--font-heading); font-size:1.2rem; font-weight:700;">
+        Inventário de Medicamentos em Balcão
+      </h2>
+      <span style="font-size:0.8rem; color:#64748B;">
+        Dica: Use <strong>[-1 Baixa Rápida]</strong> para dar baixa ao vender no balcão físico.
+      </span>
+    </div>
+
+    <% if (medicamentos.length === 0) { %>
+      <div style="text-align:center; padding:48px 20px; background:white; border-radius:12px; border:1px solid #E2E8F0;">
+        <p style="color:#64748B; margin-bottom:14px;">Nenhum medicamento cadastrado ainda para esta farmácia.</p>
+        <button type="button" class="btn-gps-action" onclick="document.getElementById('addMedicineModal').style.display='flex'">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Cadastrar Primeiro Medicamento
+        </button>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Medicamento / DCI</th>
+              <th>Dosagem / Apresentação</th>
+              <th>Preço Unitário</th>
+              <th>Quantidade em Stock</th>
+              <th>Status</th>
+              <th style="text-align:right;">Ações de Balcão</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% medicamentos.forEach(med => { %>
+              <tr>
+                <td>
+                  <strong><%= med.nome_comercial %></strong>
+                  <% if (med.principio_ativo) { %>
+                    <div style="font-size:0.75rem; color:#64748B;"><%= med.principio_ativo %></div>
+                  <% } %>
+                </td>
+                <td><%= med.dosagem %></td>
+                <td>
+                  <strong style="color:#0F172A;"><%= med.preco.toFixed(2) %></strong> <small style="color:#64748B;">MZN</small>
+                </td>
+                <td>
+                  <span id="stock-val-<%= med.id %>" style="font-weight:700; font-size:1rem;">
+                    <%= med.quantidade_stock %>
+                  </span> caixas
+                </td>
+                <td>
+                  <% if (med.quantidade_stock > 5) { %>
+                    <span class="stock-badge stock-badge-high">
+                      <svg class="ui-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      Disponível
+                    </span>
+                  <% } else if (med.quantidade_stock > 0) { %>
+                    <span class="stock-badge stock-badge-low">
+                      <svg class="ui-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                      Stock Baixo
+                    </span>
+                  <% } else { %>
+                    <span class="stock-badge" style="background:#FEE2E2; color:#991B1B;">
+                      <svg class="ui-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                      </svg>
+                      Esgotado
+                    </span>
+                  <% } %>
+                </td>
+                <td style="text-align:right;">
+                  <div style="display:inline-flex; gap:6px;">
+                    <!-- Baixa Rápida em 1 Clique -->
+                    <form action="/medicines/<%= med.id %>/decrement" method="POST" style="display:inline;">
+                      <button 
+                        type="submit" 
+                        class="btn-table-action" 
+                        title="Vendeu 1 unidade no balcão? Dá baixa imediata"
+                        <%= med.quantidade_stock <= 0 ? 'disabled' : '' %>
+                      >
+                        <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="13 17 18 12 13 7"/>
+                          <polyline points="6 17 11 12 6 7"/>
+                        </svg>
+                        -1 Baixa Rápida
+                      </button>
+                    </form>
+
+                    <!-- Editar Stock / Preço -->
+                    <button 
+                      type="button" 
+                      class="btn-table-action" 
+                      onclick="openEditModal('<%= med.id %>', '<%= med.nome_comercial %>', '<%= med.quantidade_stock %>', '<%= med.preco %>')"
+                    >
+                      <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                        <path d="m15 5 4 4"/>
+                      </svg>
+                      Editar
+                    </button>
+
+                    <!-- Remover -->
+                    <form action="/medicines/<%= med.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja remover este medicamento do catálogo?');">
+                      <button type="submit" class="btn-table-action danger" title="Remover item">
+                        <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 6h18"/>
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+</main>
+
+<!-- MODAL: Adicionar Novo Medicamento -->
+<div id="addMedicineModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:999; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:16px; max-width:520px; width:100%; padding:28px; box-shadow:var(--shadow-hover); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="font-family:var(--font-heading); font-size:1.3rem; color:var(--primary); font-weight:800; display:flex; align-items:center; gap:6px;">
+        <svg class="ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Inserir Medicamento em Stock
+      </h3>
+      <button type="button" onclick="document.getElementById('addMedicineModal').style.display='none'" style="background:none; border:none; cursor:pointer; color:#64748B;">
+        <svg class="ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <form action="/medicines/add" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="add_nome">Nome Comercial *</label>
+        <input type="text" name="nome_comercial" id="add_nome" class="form-input" placeholder="Ex: Paracetamol 500mg, Amoxicilina" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="add_principio">Princípio Ativo (DCI)</label>
+        <input type="text" name="principio_ativo" id="add_principio" class="form-input" placeholder="Ex: Paracetamol, Ibuprofeno">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="add_dosagem">Dosagem / Apresentação *</label>
+        <input type="text" name="dosagem" id="add_dosagem" class="form-input" placeholder="Ex: Caixa com 20 Comprimidos, Xarope 120ml" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="add_qtd">Quantidade Inicial em Stock *</label>
+          <input type="number" name="quantidade_stock" id="add_qtd" class="form-input" min="0" value="10" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="add_preco">Preço Unitário (MZN) *</label>
+          <input type="number" step="0.50" name="preco" id="add_preco" class="form-input" min="0" placeholder="Ex: 150.00" required>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button type="button" class="nav-btn nav-btn-outline" onclick="document.getElementById('addMedicineModal').style.display='none'">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-gps-action">
+          Salvar no Stock
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: Editar Medicamento -->
+<div id="editMedicineModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:999; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:16px; max-width:440px; width:100%; padding:24px; box-shadow:var(--shadow-hover); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3 style="font-family:var(--font-heading); font-size:1.2rem; color:var(--primary); font-weight:800;" id="editModalTitle">
+        Editar Stock e Preço
+      </h3>
+      <button type="button" onclick="document.getElementById('editMedicineModal').style.display='none'" style="background:none; border:none; cursor:pointer; color:#64748B;">
+        <svg class="ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <form id="editForm" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="edit_qtd">Quantidade em Stock</label>
+        <input type="number" name="quantidade_stock" id="edit_qtd" class="form-input" min="0" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_preco">Preço (MZN)</label>
+        <input type="number" step="0.50" name="preco" id="edit_preco" class="form-input" min="0" required>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button type="button" class="nav-btn nav-btn-outline" onclick="document.getElementById('editMedicineModal').style.display='none'">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-gps-action">
+          Atualizar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: Editar Dados e Localização da Farmácia -->
+<div id="editPharmacyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:999; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:16px; max-width:620px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:var(--shadow-hover); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #E2E8F0; padding-bottom:10px;">
+      <div>
+        <h3 style="font-family:var(--font-heading); font-size:1.25rem; color:var(--primary); font-weight:800;">
+          Editar Dados do Estabelecimento
+        </h3>
+        <p style="font-size:0.8rem; color:#64748B;">
+          Atualize os contatos de atendimento, horários e a localização física da farmácia.
+        </p>
+      </div>
+      <button type="button" onclick="document.getElementById('editPharmacyModal').style.display='none'" style="background:none; border:none; cursor:pointer; color:#64748B; font-size:1.5rem; line-height:1;">
+        &times;
+      </button>
+    </div>
+
+    <form action="/pharmacy/update-profile" method="POST" id="editPharmacyProfileForm">
+      <div class="form-group">
+        <label class="form-label" for="edit_pharm_nome">Nome da Farmácia *</label>
+        <input type="text" name="nome" id="edit_pharm_nome" class="form-input" value="<%= farmacia.nome %>" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit_pharm_tel">Telefone de Atendimento / Linha do Balcão *</label>
+          <input type="tel" name="telefone" id="edit_pharm_tel" class="form-input" value="<%= farmacia.telefone %>" placeholder="+258 84 123 4567" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_pharm_horario">Horário de Funcionamento</label>
+          <input type="text" name="horario_funcionamento" id="edit_pharm_horario" class="form-input" value="<%= farmacia.horario_funcionamento %>" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit_pharm_bairro">Bairro em Pemba *</label>
+          <input type="text" name="bairro" id="edit_pharm_bairro" class="form-input" value="<%= farmacia.bairro %>" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_pharm_cidade">Cidade / Província</label>
+          <input type="text" name="cidade" id="edit_pharm_cidade" class="form-input" value="<%= farmacia.cidade %>, <%= farmacia.provincia %>" readonly style="background:#F8FAFC;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_pharm_endereco">Ponto de Referência / Endereço Completo</label>
+        <input type="text" name="endereco_detalhado" id="edit_pharm_endereco" class="form-input" value="<%= farmacia.endereco_detalhado || '' %>" placeholder="Ex: Av. Eduardo Mondlane, ao lado do Mercado">
+      </div>
+
+      <!-- SEÇÃO DE ATUALIZAÇÃO DA LOCALIZAÇÃO EXATA (GPS) -->
+      <div class="gps-capture-card" style="margin-bottom:16px;">
+        <h4 style="font-family:var(--font-heading); font-size:0.95rem; color:#1E3E6D; margin-bottom:4px; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Localização Exata da Farmácia Física
+        </h4>
+        <p style="font-size:0.78rem; color:#475569; margin-bottom:10px; max-width:480px; margin-left:auto; margin-right:auto;">
+          Estando no balcão da sua farmácia, use o botão abaixo para sincronizar a posição física exata da loja via satélite.
+        </p>
+
+        <button type="button" class="btn-gps-trigger" id="btnPharmacyUpdateGPS" onclick="captureProfileGPS()">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="22" y1="12" x2="18" y2="12"/>
+            <line x1="6" y1="12" x2="2" y2="12"/>
+            <line x1="12" y1="6" x2="12" y2="2"/>
+            <line x1="12" y1="22" x2="12" y2="18"/>
+          </svg>
+          <span>Re-capturar Coordenadas do Sensor GPS</span>
+        </button>
+
+        <div id="profileGpsFeedback" class="gps-feedback" style="display:none; font-size:0.78rem; margin-top:8px;"></div>
+
+        <div class="form-row" style="margin-top:10px;">
+          <div>
+            <label class="form-label" style="font-size:0.75rem;">Latitude Exata *</label>
+            <input type="number" step="0.000001" name="latitude" id="profileLatField" class="form-input" style="font-size:0.85rem; text-align:center; background:#F8FAFC;" value="<%= farmacia.latitude.toFixed(6) %>" required>
+          </div>
+          <div>
+            <label class="form-label" style="font-size:0.75rem;">Longitude Exata *</label>
+            <input type="number" step="0.000001" name="longitude" id="profileLonField" class="form-input" style="font-size:0.85rem; text-align:center; background:#F8FAFC;" value="<%= farmacia.longitude.toFixed(6) %>" required>
+          </div>
+        </div>
+
+        <div style="margin-top:8px; text-align:center;">
+          <a href="https://www.google.com/maps?q=<%= farmacia.latitude %>,<%= farmacia.longitude %>" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem; color:#2563EB; text-decoration:underline;">
+            Ver localização atual no Google Maps
+          </a>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_pharm_senha">Nova Palavra-passe (Opcional)</label>
+        <input type="password" name="nova_senha" id="edit_pharm_senha" class="form-input" placeholder="Deixe em branco se não desejar alterar a palavra-passe">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button type="button" class="nav-btn nav-btn-outline" onclick="document.getElementById('editPharmacyModal').style.display='none'">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-gps-action">
+          Salvar Dados da Farmácia
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openEditModal(id, nome, qtd, preco) {
+    document.getElementById('editModalTitle').innerText = 'Editar: ' + nome;
+    document.getElementById('edit_qtd').value = qtd;
+    document.getElementById('edit_preco').value = preco;
+    document.getElementById('editForm').action = '/medicines/' + id + '/update';
+    document.getElementById('editMedicineModal').style.display = 'flex';
+  }
+
+  function captureProfileGPS() {
+    const feedback = document.getElementById('profileGpsFeedback');
+    const btn = document.getElementById('btnPharmacyUpdateGPS');
+
+    if (!navigator.geolocation) {
+      alert('Geolocalização não é suportada pelo seu navegador.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>A consultar satélites GPS com alta precisão...</span>';
+    feedback.style.display = 'block';
+    feedback.style.color = '#2563EB';
+    feedback.innerText = 'A obter coordenadas físicas do balcão...';
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        const acc = Math.round(pos.coords.accuracy);
+
+        document.getElementById('profileLatField').value = lat;
+        document.getElementById('profileLonField').value = lon;
+
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Coordenadas Sincronizadas!</span>
+        `;
+        btn.style.background = '#10B981';
+
+        feedback.style.color = '#166534';
+        feedback.innerHTML = `Localização física do balcão atualizada! Precisão: ±${acc} metros (Lat: ${lat}, Lon: ${lon})`;
+      },
+      (err) => {
+        console.error('Erro GPS:', err);
+        btn.disabled = false;
+        btn.innerHTML = '<span>Tentar Novamente</span>';
+        feedback.style.color = '#DC2626';
+        feedback.innerText = 'Falha ao ler o GPS. Certifique-se de autorizar a permissão de localização.';
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }
+</script>
+
+<%- include('../partials/footer') %>
+

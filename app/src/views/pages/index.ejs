@@ -1,0 +1,316 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="main-wrapper">
+  <!-- Hero Section & Search -->
+  <section class="hero-box">
+    <h1 class="hero-title">Encontre Medicamentos em <span>Farmácias Perto de Si</span></h1>
+    <p class="hero-subtitle">
+      Pesquise o fármaco prescrito e descubra quais farmácias de Pemba têm o produto em stock agora, ordenadas pela menor distância da sua localização GPS.
+    </p>
+
+    <!-- Barra de Pesquisa Integrada com GPS -->
+    <div class="search-card">
+      <form action="/" method="GET" class="search-form" id="searchForm">
+        <input type="hidden" name="lat" id="userLatInput" value="<%= userLat || '' %>">
+        <input type="hidden" name="lon" id="userLonInput" value="<%= userLon || '' %>">
+
+        <div class="input-group-search">
+          <span class="search-icon">
+            <svg class="ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+          </span>
+          <input 
+            type="text" 
+            name="q" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Digite o nome do remédio (ex: Paracetamol, Amoxicilina, Coartem...)" 
+            value="<%= query || '' %>"
+            autocomplete="off"
+          >
+        </div>
+
+        <button type="submit" class="btn-gps-action" id="btnSearch">
+          <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+          <span>Pesquisar</span>
+        </button>
+      </form>
+
+      <!-- Status e Ativador do GPS -->
+      <div class="gps-status-indicator" id="gpsStatusContainer">
+        <% if (userLat && userLon) { %>
+          <span class="gps-badge-active">
+            <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            GPS Activo: Resultados ordenados pela sua proximidade atual
+          </span>
+          <button type="button" onclick="refreshGPS()" style="background:none; border:none; color:#2563EB; font-size:0.8rem; cursor:pointer; text-decoration:underline;">
+            (Atualizar GPS)
+          </button>
+        <% } else { %>
+          <span>Localização desativada.</span>
+          <button type="button" class="btn-table-action" onclick="requestGPS()" style="color:#2563EB; font-weight:700;">
+            <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="22" y1="12" x2="18" y2="12"/>
+              <line x1="6" y1="12" x2="2" y2="12"/>
+              <line x1="12" y1="6" x2="12" y2="2"/>
+              <line x1="12" y1="22" x2="12" y2="18"/>
+            </svg>
+            Activar Meu GPS para Ordenar por Distância
+          </button>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sugestões Rápidas de Fármacos Mais Procurados -->
+  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:24px; padding:0 4px;">
+    <span style="font-size:0.82rem; font-weight:700; color:var(--text-muted);">Medicamentos Frequentes:</span>
+    <a href="/?q=Paracetamol<%= userLat ? `&lat=${userLat}&lon=${userLon}` : '' %>" class="btn-table-action">Paracetamol</a>
+    <a href="/?q=Amoxicilina<%= userLat ? `&lat=${userLat}&lon=${userLon}` : '' %>" class="btn-table-action">Amoxicilina</a>
+    <a href="/?q=Coartem<%= userLat ? `&lat=${userLat}&lon=${userLon}` : '' %>" class="btn-table-action">Coartem (Malária)</a>
+    <a href="/?q=Ibuprofeno<%= userLat ? `&lat=${userLat}&lon=${userLon}` : '' %>" class="btn-table-action">Ibuprofeno</a>
+    <a href="/?q=SRO<%= userLat ? `&lat=${userLat}&lon=${userLon}` : '' %>" class="btn-table-action">Sais de Reidratação</a>
+    <% if (query) { %>
+      <a href="/<%= userLat ? `?lat=${userLat}&lon=${userLon}` : '' %>" class="btn-table-action danger" style="margin-left:auto;">
+        <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        Limpar Filtro
+      </a>
+    <% } %>
+  </div>
+
+  <!-- Resultados da Busca -->
+  <section>
+    <div class="results-header">
+      <div>
+        <h2 class="results-title">
+          <% if (query) { %>
+            Resultados para "<%= query %>"
+          <% } else { %>
+            Medicamentos Disponíveis em Stock
+          <% } %>
+        </h2>
+        <p class="results-count">
+          <%= results.length %> <%= results.length === 1 ? 'farmácia encontrada com stock' : 'farmácias encontradas com stock disponível' %>
+        </p>
+      </div>
+
+      <% if (userLat && userLon) { %>
+        <span class="stock-badge stock-badge-high" style="font-size:0.8rem;">
+          <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Ordenado por Menor Distância
+        </span>
+      <% } %>
+    </div>
+
+    <% if (results.length === 0) { %>
+      <div style="text-align:center; padding:60px 20px; background:white; border-radius:16px; border:1px solid #E2E8F0;">
+        <div style="margin-bottom:12px; color:var(--text-muted);">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </div>
+        <h3 style="font-family:var(--font-heading); color:#0F172A; font-size:1.3rem;">Nenhum medicamento encontrado em stock</h3>
+        <p style="color:#64748B; max-width:480px; margin:8px auto 20px; font-size:0.9rem;">
+          Não encontramos farmácias em Pemba com este medicamento em stock no momento, ou o produto pode estar temporariamente esgotado.
+        </p>
+        <a href="/" class="nav-btn nav-btn-primary">Ver Todos os Medicamentos Disponíveis</a>
+      </div>
+    <% } else { %>
+      <div class="results-grid">
+        <% results.forEach(item => { %>
+          <div class="pharmacy-card">
+            <div class="card-top">
+              <div>
+                <h3 class="card-pharmacy-name"><%= item.farmacia.nome %></h3>
+                <span style="font-size:0.78rem; color:#64748B; display:flex; align-items:center; gap:4px; margin-top:2px;">
+                  <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  <%= item.farmacia.bairro %>, <%= item.farmacia.cidade %> • Horário: <%= item.farmacia.horario_funcionamento %>
+                </span>
+              </div>
+
+              <% if (item.distancia_km > 0) { %>
+                <span class="card-distance-badge" title="Distância em linha reta calculada via GPS">
+                  <svg class="ui-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                  </svg>
+                  a <%= item.distancia_formatada %>
+                </span>
+              <% } %>
+            </div>
+
+            <!-- Dados do Medicamento -->
+            <div class="card-medicine-section">
+              <div class="card-med-name"><%= item.medicamento.nome_comercial %></div>
+              <% if (item.medicamento.principio_ativo) { %>
+                <div class="card-med-sub">Princípio Ativo: <%= item.medicamento.principio_ativo %></div>
+              <% } %>
+              <div style="font-size:0.82rem; color:#475569; margin-bottom:10px;">
+                Apresentação: <strong><%= item.medicamento.dosagem %></strong>
+              </div>
+
+              <div class="card-med-meta">
+                <div class="card-price">
+                  <%= item.medicamento.preco.toFixed(2) %> <small>MZN</small>
+                </div>
+
+                <% if (item.medicamento.quantidade_stock > 5) { %>
+                  <span class="stock-badge stock-badge-high">
+                    <svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Em Stock (<%= item.medicamento.quantidade_stock %> unid.)
+                  </span>
+                <% } else { %>
+                  <span class="stock-badge stock-badge-low">
+                    <svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Stock Baixo (<%= item.medicamento.quantidade_stock %> unid.)
+                  </span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Morada -->
+            <div class="card-address">
+              <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+                <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+                <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
+                <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
+                <path d="M10 6h4"/>
+                <path d="M10 10h4"/>
+                <path d="M10 14h4"/>
+                <path d="M10 18h4"/>
+              </svg>
+              <span><%= item.farmacia.bairro %> • Telefone: <strong><%= item.farmacia.telefone %></strong></span>
+            </div>
+
+            <!-- Botões de Ação Imediata -->
+            <div class="card-actions">
+              <a 
+                href="tel:<%= item.farmacia.telefone.replace(/[^\d+]/g, '') %>" 
+                class="btn-card btn-call" 
+                onclick="notifyCalling('<%= item.farmacia.nome.replace(/'/g, "\\'") %>', '<%= item.farmacia.telefone %>')"
+                title="Abrir o aplicativo de chamada do seu dispositivo para ligar para o balcão"
+              >
+                <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <span>Ligar para o Balcão</span>
+              </a>
+              <a 
+                href="https://www.google.com/maps/dir/?api=1&destination=<%= item.farmacia.latitude %>,<%= item.farmacia.longitude %>" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="btn-card btn-route"
+              >
+                <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                </svg>
+                <span>Como Chegar</span>
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+</main>
+
+<script>
+  // Script de Geolocalização Instantânea para Pacientes
+  function requestGPS() {
+    const statusContainer = document.getElementById('gpsStatusContainer');
+    if (!navigator.geolocation) {
+      alert('Geolocalização não é suportada pelo seu navegador.');
+      return;
+    }
+
+    statusContainer.innerHTML = '<span>A obter coordenadas do seu GPS...</span>';
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        document.getElementById('userLatInput').value = lat;
+        document.getElementById('userLonInput').value = lon;
+        
+        // Recarrega a página preservando a busca atual com as novas coordenadas
+        const q = document.getElementById('searchInput').value;
+        const newUrl = `/?q=${encodeURIComponent(q)}&lat=${lat}&lon=${lon}`;
+        window.location.href = newUrl;
+      },
+      (err) => {
+        console.warn('Erro ao obter GPS:', err);
+        statusContainer.innerHTML = `
+          <span style="color:#DC2626; display:inline-flex; align-items:center; gap:4px;">
+            <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Permissão de localização negada ou indisponível.
+          </span>
+          <button type="button" class="btn-table-action" onclick="requestGPS()">Tentar Novamente</button>
+        `;
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }
+
+  function refreshGPS() {
+    requestGPS();
+  }
+
+  function notifyCalling(farmaciaNome, telefone) {
+    // Feedback visual instantâneo ao acionar o discador telefônico do usuário
+    const toast = document.createElement('div');
+    toast.style.position = 'fixed';
+    toast.style.bottom = '24px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = '#0F172A';
+    toast.style.color = '#FFFFFF';
+    toast.style.padding = '12px 20px';
+    toast.style.borderRadius = '10px';
+    toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+    toast.style.fontSize = '0.86rem';
+    toast.style.zIndex = '9999';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '8px';
+    toast.innerHTML = `
+      <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      <span>A abrir chamada para <strong>${farmaciaNome}</strong> (${telefone})...</span>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.5s ease';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 500);
+    }, 3500);
+  }
+</script>
+
+<%- include('../partials/footer') %>

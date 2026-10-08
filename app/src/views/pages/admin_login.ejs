@@ -1,0 +1,91 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="main-wrapper">
+  <div class="auth-container" style="max-width:480px;">
+    <div class="auth-header">
+      <div style="margin-bottom:12px; color:var(--primary); display:flex; justify-content:center;">
+        <div style="width:52px; height:52px; background:linear-gradient(135deg, #1E3E6D, #0284C7); border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; box-shadow:var(--shadow-md);">
+          <svg class="ui-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+      </div>
+      <h1 class="auth-title">Portal do Administrador</h1>
+      <p class="auth-subtitle">
+        Acesso restrito para gestão e credenciamento de farmácias físicas na cidade de Pemba.
+      </p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error">
+        <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>
+          <% if (error === 'auth_required') { %>
+            É necessário autenticar-se como administrador para aceder ao painel.
+          <% } else if (error === 'session_expired') { %>
+            A sua sessão de administrador expirou. Por favor, autentique-se novamente.
+          <% } else { %>
+            <%= error %>
+          <% } %>
+        </span>
+      </div>
+    <% } %>
+
+    <form action="/admin/login" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="email">E-mail Institucional do Administrador</label>
+        <input 
+          type="email" 
+          name="email" 
+          id="email" 
+          class="form-input" 
+          placeholder="admin@farmalocal.co.mz" 
+          value="admin@farmalocal.co.mz"
+          required 
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="senha">Palavra-passe (Senha)</label>
+        <input 
+          type="password" 
+          name="senha" 
+          id="senha" 
+          class="form-input" 
+          placeholder="Digite a palavra-passe do administrador" 
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn-gps-action" style="width:100%; margin-top:12px;">
+        <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span>Aceder ao Painel Administrativo</span>
+      </button>
+
+      <div style="margin-top:24px; padding:12px 14px; background:#F8FAFC; border-radius:8px; font-size:0.78rem; color:#64748B; border:1px solid #E2E8F0; display:flex; gap:10px; align-items:flex-start;">
+        <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4"/>
+          <path d="M12 8h.01"/>
+        </svg>
+        <div>
+          <strong style="color:#0F172A;">Credencial Mestre Padrão:</strong><br>
+          • Utilizador: <code>admin@farmalocal.co.mz</code><br>
+          • Senha: <code>admin123</code>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

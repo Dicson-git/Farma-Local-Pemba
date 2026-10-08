@@ -1,0 +1,595 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="main-wrapper">
+  <!-- Cabeçalho do Painel do Administrador -->
+  <div class="dashboard-header">
+    <div class="dash-pharmacy-info">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <h1>Gestão Central de Farmácias</h1>
+        <span class="stock-badge stock-badge-high" style="font-size:0.75rem; background:#DBEAFE; color:#1E40AF;">
+          <svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          Módulo de Administração
+        </span>
+      </div>
+      <p style="margin-top:4px; color:#64748B; font-size:0.88rem;">
+        Controle exclusivo de credenciamento, localização física exata e desativação de farmácias em Pemba.
+      </p>
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center;">
+      <button type="button" class="btn-gps-action" onclick="document.getElementById('addPharmacyModal').style.display='flex'">
+        <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span>Cadastrar Nova Farmácia</span>
+      </button>
+      <a href="/admin/logout" class="nav-btn nav-btn-outline" style="color:#EF4444; border-color:#FCA5A5;">
+        <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Terminar Sessão</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Alertas de Feedback -->
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+      <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      <span>
+        <% if (success === 'farmacia_cadastrada') { %>
+          Farmácia cadastrada com sucesso com localização exata e credenciais ativas!
+        <% } else if (success === 'farmacia_removida') { %>
+          Farmácia e respetivo inventário de medicamentos removidos com sucesso do sistema.
+        <% } else { %>
+          Operação administrativa realizada com sucesso.
+        <% } %>
+      </span>
+    </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+      <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>
+        <% if (error === 'email_duplicado') { %>
+          Erro: Já existe uma farmácia cadastrada com este endereço de e-mail.
+        <% } else if (error === 'coordenadas_obrigatorias' || error === 'coordenadas_invalidas') { %>
+          Erro: As coordenadas GPS (Latitude e Longitude) são obrigatórias e devem refletir a localização exata da farmácia física.
+        <% } else if (error === 'campos_obrigatorios') { %>
+          Erro: Preencha todos os campos obrigatórios da farmácia.
+        <% } else { %>
+          <%= error %>
+        <% } %>
+      </span>
+    </div>
+  <% } %>
+
+  <!-- Estatísticas Gerais -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:24px;">
+    <div style="background:white; padding:18px; border-radius:12px; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm);">
+      <span style="font-size:0.78rem; text-transform:uppercase; color:#64748B; font-weight:700;">Farmácias Cadastradas</span>
+      <div style="font-family:var(--font-heading); font-size:1.9rem; font-weight:800; color:#1E3E6D; margin-top:4px;">
+        <%= farmacias.length %>
+      </div>
+      <p style="font-size:0.78rem; color:#64748B; margin-top:4px;">Estabelecimentos ativos em Pemba</p>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm);">
+      <span style="font-size:0.78rem; text-transform:uppercase; color:#64748B; font-weight:700;">Total de Medicamentos</span>
+      <div style="font-family:var(--font-heading); font-size:1.9rem; font-weight:800; color:#0284C7; margin-top:4px;">
+        <%= totalMedicamentos %>
+      </div>
+      <p style="font-size:0.78rem; color:#64748B; margin-top:4px;">Itens catalogados na base de dados</p>
+    </div>
+
+    <div style="background:white; padding:18px; border-radius:12px; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm);">
+      <span style="font-size:0.78rem; text-transform:uppercase; color:#64748B; font-weight:700;">Cobertura Geográfica</span>
+      <div style="font-family:var(--font-heading); font-size:1.9rem; font-weight:800; color:#10B981; margin-top:4px;">
+        100% GPS
+      </div>
+      <p style="font-size:0.78rem; color:#64748B; margin-top:4px;">Coordenadas físicas auditadas</p>
+    </div>
+  </div>
+
+  <!-- Tabela de Gestão de Farmácias -->
+  <section style="background:white; border-radius:16px; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm); overflow:hidden;">
+    <div style="padding:18px 20px; border-bottom:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h2 style="font-family:var(--font-heading); font-size:1.15rem; color:#0F172A; font-weight:700;">
+          Farmácias Credenciadas no Sistema
+        </h2>
+        <p style="font-size:0.8rem; color:#64748B; margin-top:2px;">
+          Apenas o administrador possui permissão para cadastrar ou desativar estabelecimentos.
+        </p>
+      </div>
+      <span style="font-size:0.82rem; color:#64748B; background:#F8FAFC; padding:4px 10px; border-radius:8px; border:1px solid #E2E8F0;">
+        Total: <strong><%= farmacias.length %> farmácias</strong>
+      </span>
+    </div>
+
+    <% if (farmacias.length === 0) { %>
+      <div style="padding:48px 20px; text-align:center; color:#64748B;">
+        <p>Nenhuma farmácia cadastrada no momento.</p>
+        <button type="button" class="btn-gps-action" style="margin-top:12px;" onclick="document.getElementById('addPharmacyModal').style.display='flex'">
+          Cadastrar Primeira Farmácia
+        </button>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Farmácia / Contato</th>
+              <th>Bairro & Endereço Físico</th>
+              <th>Localização Exata (GPS)</th>
+              <th style="text-align:center;">Itens em Stock</th>
+              <th style="text-align:center;">Ações Administrativas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% farmacias.forEach(f => { %>
+              <tr>
+                <td>
+                  <strong style="color:#0F172A; font-size:0.92rem;"><%= f.nome %></strong><br>
+                  <span style="font-size:0.78rem; color:#64748B;"><%= f.email %></span><br>
+                  <a href="tel:<%= f.telefone.replace(/[^\d+]/g, '') %>" style="display:inline-flex; align-items:center; gap:4px; font-size:0.78rem; color:#10B981; font-weight:600; text-decoration:none; margin-top:2px;" title="Testar chamada para o balcão">
+                    <svg class="ui-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                    <%= f.telefone %> (Ligar)
+                  </a>
+                </td>
+                <td>
+                  <span style="font-weight:600; color:#1E3E6D;"><%= f.bairro %></span><br>
+                  <span style="font-size:0.78rem; color:#64748B;"><%= f.endereco_detalhado || 'Sem ponto de referência' %></span><br>
+                  <span style="font-size:0.74rem; color:#94A3B8;">Horário: <%= f.horario_funcionamento %></span>
+                </td>
+                <td>
+                  <div style="font-size:0.8rem; font-family:monospace; color:#334155;">
+                    Lat: <%= f.latitude.toFixed(6) %><br>
+                    Lon: <%= f.longitude.toFixed(6) %>
+                  </div>
+                  <a 
+                    href="https://www.google.com/maps?q=<%= f.latitude %>,<%= f.longitude %>" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    style="font-size:0.75rem; color:#2563EB; display:inline-flex; align-items:center; gap:3px; margin-top:3px; text-decoration:underline;"
+                    title="Ver localização física exata no Google Maps"
+                  >
+                    <svg class="ui-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Ver no Google Maps
+                  </a>
+                </td>
+                <td style="text-align:center;">
+                  <span class="stock-badge stock-badge-high" style="font-size:0.8rem;">
+                    <%= f.total_medicamentos %> produtos
+                  </span>
+                </td>
+                <td style="text-align:center;">
+                  <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                    <button 
+                      type="button" 
+                      class="btn-table-action" 
+                      style="color:#2563EB; border:1px solid #BFDBFE; background:#EFF6FF; padding:6px 10px; border-radius:6px; cursor:pointer;"
+                      onclick='openAdminEditModal(<%= JSON.stringify(f) %>)'
+                      title="Editar todos os dados desta farmácia"
+                    >
+                      <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                      </svg>
+                      Editar
+                    </button>
+
+                    <form action="/admin/pharmacies/<%= f.id %>/delete" method="POST" onsubmit="return confirm('ATENÇÃO: Deseja realmente remover permanentemente a farmácia \'<%= f.nome %>\'?\n\nEsta ação excluirá também todos os <%= f.total_medicamentos %> medicamentos cadastrados por ela.');">
+                      <button type="submit" class="btn-table-action" style="color:#EF4444; border:1px solid #FCA5A5; background:#FEF2F2; padding:6px 10px; border-radius:6px; cursor:pointer;" title="Remover farmácia do sistema">
+                        <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        Remover
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+</main>
+
+<!-- Modal de Cadastro Exclusivo de Farmácia pelo Administrador -->
+<div id="addPharmacyModal" class="modal-backdrop" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:16px; width:100%; max-width:650px; max-height:90vh; overflow-y:auto; box-shadow:var(--shadow-lg); padding:24px; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #E2E8F0; padding-bottom:12px;">
+      <div>
+        <h3 style="font-family:var(--font-heading); font-size:1.2rem; color:#0F172A; font-weight:800;">
+          Cadastrar Farmácia no FarmaLocal
+        </h3>
+        <p style="font-size:0.8rem; color:#64748B;">
+          Credenciamento administrativo com coordenadas físicas exatas da loja.
+        </p>
+      </div>
+      <button type="button" onclick="document.getElementById('addPharmacyModal').style.display='none'" style="background:none; border:none; cursor:pointer; color:#94A3B8; font-size:1.5rem; line-height:1;">
+        &times;
+      </button>
+    </div>
+
+    <form action="/admin/pharmacies/add" method="POST" id="adminAddPharmacyForm">
+      <!-- Nome e Contato -->
+      <div class="form-group">
+        <label class="form-label" for="nome">Nome da Farmácia / Razão Social *</label>
+        <input type="text" name="nome" id="nome" class="form-input" placeholder="Ex: Farmácia Sagrada Família" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="telefone">Telefone / Linha de Atendimento *</label>
+          <input type="tel" name="telefone" id="telefone" class="form-input" placeholder="+258 84 123 4567" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="horario_funcionamento">Horário de Funcionamento</label>
+          <input type="text" name="horario_funcionamento" id="horario_funcionamento" class="form-input" value="08h00 às 20h00" required>
+        </div>
+      </div>
+
+      <!-- Localização em Pemba -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="bairro">Bairro em Pemba *</label>
+          <select name="bairro" id="bairro" class="form-input" required>
+            <option value="">Selecione o Bairro...</option>
+            <option value="Baixa / Centro">Baixa / Centro</option>
+            <option value="Natite">Natite</option>
+            <option value="Alto Gingone">Alto Gingone</option>
+            <option value="Cariacó">Cariacó</option>
+            <option value="Wimbi / Praia">Wimbi / Praia</option>
+            <option value="Eduardo Mondlane">Eduardo Mondlane</option>
+            <option value="Paquitequete">Paquitequete</option>
+            <option value="Maringanha">Maringanha</option>
+            <option value="Ingonane">Ingonane</option>
+            <option value="Chuiba">Chuiba</option>
+            <option value="Outro Bairro">Outro Bairro de Pemba</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cidade">Cidade / Província</label>
+          <input type="text" name="cidade" id="cidade" class="form-input" value="Pemba, Cabo Delgado" readonly style="background:#F8FAFC;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="endereco_detalhado">Endereço Físico Exato / Ponto de Referência</label>
+        <input type="text" name="endereco_detalhado" id="endereco_detalhado" class="form-input" placeholder="Ex: Av. Alberto Chipande, defronte ao Millenium BIM" required>
+      </div>
+
+      <!-- SEÇÃO CRÍTICA: LOCALIZAÇÃO EXATA DA PRÓPRIA FARMÁCIA -->
+      <div class="gps-capture-card" style="margin-bottom:16px;">
+        <h4 style="font-family:var(--font-heading); font-size:0.95rem; color:#1E3E6D; margin-bottom:4px; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Localização Exata da Própria Farmácia (GPS Balcão)
+        </h4>
+        <p style="font-size:0.78rem; color:#475569; margin-bottom:10px; max-width:480px; margin-left:auto; margin-right:auto;">
+          A localização deve ser a localização exata da farmácia física. Se estiver no estabelecimento, use o sensor do aparelho ou insira as coordenadas exatas da loja.
+        </p>
+
+        <button type="button" class="btn-gps-trigger" id="btnAdminCaptureGPS" onclick="captureAdminPharmacyGPS()">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="22" y1="12" x2="18" y2="12"/>
+            <line x1="6" y1="12" x2="2" y2="12"/>
+            <line x1="12" y1="6" x2="12" y2="2"/>
+            <line x1="12" y1="22" x2="12" y2="18"/>
+          </svg>
+          <span>Capturar Coordenadas Exatas do Sensor GPS</span>
+        </button>
+
+        <div id="adminGpsFeedback" class="gps-feedback" style="display:none; font-size:0.78rem; margin-top:8px;"></div>
+
+        <div class="form-row" style="margin-top:10px;">
+          <div>
+            <label class="form-label" style="font-size:0.75rem;">Latitude Exata *</label>
+            <input type="number" step="0.000001" name="latitude" id="adminLatField" class="form-input" style="font-size:0.85rem; text-align:center; background:#F8FAFC;" value="-12.971500" required>
+          </div>
+          <div>
+            <label class="form-label" style="font-size:0.75rem;">Longitude Exata *</label>
+            <input type="number" step="0.000001" name="longitude" id="adminLonField" class="form-input" style="font-size:0.85rem; text-align:center; background:#F8FAFC;" value="40.518000" required>
+          </div>
+        </div>
+
+        <div style="margin-top:8px; text-align:center;">
+          <a href="#" id="previewMapLink" onclick="openPreviewMap(event)" style="font-size:0.78rem; color:#2563EB; text-decoration:underline;">
+            Testar coordenadas no Google Maps antes de salvar
+          </a>
+        </div>
+      </div>
+
+      <!-- Credenciais de Acesso para o Gerente da Farmácia -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail de Acesso da Farmácia *</label>
+          <input type="email" name="email" id="email" class="form-input" placeholder="farmacia@farmalocal.co.mz" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="senha">Palavra-passe Inicial *</label>
+          <input type="text" name="senha" id="senha" class="form-input" value="123456" placeholder="Definir senha de acesso" required>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-table-action" onclick="document.getElementById('addPharmacyModal').style.display='none'">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-gps-action">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Concluir Credenciamento da Farmácia</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function captureAdminPharmacyGPS() {
+    const feedback = document.getElementById('adminGpsFeedback');
+    const btn = document.getElementById('btnAdminCaptureGPS');
+
+    if (!navigator.geolocation) {
+      alert('Seu navegador não possui suporte a geolocalização nativa.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>A consultar satélites GPS com alta precisão...</span>';
+    feedback.style.display = 'block';
+    feedback.style.color = '#2563EB';
+    feedback.innerText = 'A obter coordenadas físicas exatas da loja...';
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        const acc = Math.round(pos.coords.accuracy);
+
+        document.getElementById('adminLatField').value = lat;
+        document.getElementById('adminLonField').value = lon;
+
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Coordenadas Exatas Registadas!</span>
+        `;
+        btn.style.background = '#10B981';
+
+        feedback.style.color = '#166534';
+        feedback.innerHTML = `Localização exata registada! Precisão do sensor: ±${acc} metros (Lat: ${lat}, Lon: ${lon})`;
+      },
+      (err) => {
+        console.error('Erro GPS:', err);
+        btn.disabled = false;
+        btn.innerHTML = `<span>Tentar Novamente</span>`;
+        feedback.style.color = '#DC2626';
+        feedback.innerText = 'Não foi possível ler o GPS do sensor. Verifique as permissões de localização no navegador.';
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }
+
+  function openPreviewMap(e) {
+    e.preventDefault();
+    const lat = document.getElementById('adminLatField').value;
+    const lon = document.getElementById('adminLonField').value;
+    if (!lat || !lon) {
+      alert('Por favor informe a latitude e longitude primeiro.');
+      return;
+    }
+    window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
+  }
+
+  function openAdminEditModal(f) {
+    document.getElementById('editAdminModalTitle').innerText = 'Editar Farmácia: ' + f.nome;
+    document.getElementById('editAdminForm').action = '/admin/pharmacies/' + f.id + '/update';
+    document.getElementById('edit_admin_nome').value = f.nome;
+    document.getElementById('edit_admin_tel').value = f.telefone;
+    document.getElementById('edit_admin_email').value = f.email;
+    document.getElementById('edit_admin_horario').value = f.horario_funcionamento;
+    document.getElementById('edit_admin_bairro').value = f.bairro;
+    document.getElementById('edit_admin_endereco').value = f.endereco_detalhado || '';
+    document.getElementById('edit_admin_lat').value = f.latitude.toFixed(6);
+    document.getElementById('edit_admin_lon').value = f.longitude.toFixed(6);
+    document.getElementById('edit_admin_previewMap').href = `https://www.google.com/maps?q=${f.latitude},${f.longitude}`;
+    document.getElementById('editAdminPharmacyModal').style.display = 'flex';
+  }
+
+  function captureAdminEditModalGPS() {
+    const feedback = document.getElementById('adminEditGpsFeedback');
+    const btn = document.getElementById('btnAdminEditCaptureGPS');
+
+    if (!navigator.geolocation) {
+      alert('Geolocalização não é suportada pelo seu navegador.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>A consultar satélites GPS com alta precisão...</span>';
+    feedback.style.display = 'block';
+    feedback.style.color = '#2563EB';
+    feedback.innerText = 'A obter coordenadas da loja física...';
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        const acc = Math.round(pos.coords.accuracy);
+
+        document.getElementById('edit_admin_lat').value = lat;
+        document.getElementById('edit_admin_lon').value = lon;
+        document.getElementById('edit_admin_previewMap').href = `https://www.google.com/maps?q=${lat},${lon}`;
+
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Coordenadas Sincronizadas!</span>
+        `;
+        btn.style.background = '#10B981';
+
+        feedback.style.color = '#166534';
+        feedback.innerHTML = `Localização exata registada! Precisão: ±${acc} metros (Lat: ${lat}, Lon: ${lon})`;
+      },
+      (err) => {
+        console.error('Erro GPS:', err);
+        btn.disabled = false;
+        btn.innerHTML = '<span>Tentar Novamente</span>';
+        feedback.style.color = '#DC2626';
+        feedback.innerText = 'Não foi possível ler o GPS. Verifique as permissões do navegador.';
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }
+</script>
+
+<!-- Modal de Edição de Farmácia pelo Administrador -->
+<div id="editAdminPharmacyModal" class="modal-backdrop" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:16px; width:100%; max-width:650px; max-height:90vh; overflow-y:auto; box-shadow:var(--shadow-lg); padding:24px; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #E2E8F0; padding-bottom:12px;">
+      <div>
+        <h3 style="font-family:var(--font-heading); font-size:1.2rem; color:#0F172A; font-weight:800;" id="editAdminModalTitle">
+          Editar Dados da Farmácia
+        </h3>
+        <p style="font-size:0.8rem; color:#64748B;">
+          Atualização administrativa de dados, localização física e credenciais.
+        </p>
+      </div>
+      <button type="button" onclick="document.getElementById('editAdminPharmacyModal').style.display='none'" style="background:none; border:none; cursor:pointer; color:#94A3B8; font-size:1.5rem; line-height:1;">
+        &times;
+      </button>
+    </div>
+
+    <form method="POST" id="editAdminForm">
+      <div class="form-group">
+        <label class="form-label" for="edit_admin_nome">Nome da Farmácia / Razão Social *</label>
+        <input type="text" name="nome" id="edit_admin_nome" class="form-input" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit_admin_tel">Telefone / Linha do Balcão *</label>
+          <input type="tel" name="telefone" id="edit_admin_tel" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_admin_horario">Horário de Funcionamento</label>
+          <input type="text" name="horario_funcionamento" id="edit_admin_horario" class="form-input" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit_admin_bairro">Bairro em Pemba *</label>
+          <input type="text" name="bairro" id="edit_admin_bairro" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_admin_cidade">Cidade</label>
+          <input type="text" name="cidade" id="edit_admin_cidade" class="form-input" value="Pemba" readonly style="background:#F8FAFC;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_admin_endereco">Ponto de Referência / Endereço Físico Exato</label>
+        <input type="text" name="endereco_detalhado" id="edit_admin_endereco" class="form-input" required>
+      </div>
+
+      <!-- LOCALIZAÇÃO EXATA DA PRÓPRIA FARMÁCIA -->
+      <div class="gps-capture-card" style="margin-bottom:16px;">
+        <h4 style="font-family:var(--font-heading); font-size:0.95rem; color:#1E3E6D; margin-bottom:4px; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Localização Exata da Loja (GPS do Balcão)
+        </h4>
+
+        <button type="button" class="btn-gps-trigger" id="btnAdminEditCaptureGPS" onclick="captureAdminEditModalGPS()">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="22" y1="12" x2="18" y2="12"/>
+            <line x1="6" y1="12" x2="2" y2="12"/>
+            <line x1="12" y1="6" x2="12" y2="2"/>
+            <line x1="12" y1="22" x2="12" y2="18"/>
+          </svg>
+          <span>Atualizar Coordenadas via Sensor GPS</span>
+        </button>
+
+        <div id="adminEditGpsFeedback" class="gps-feedback" style="display:none; font-size:0.78rem; margin-top:8px;"></div>
+
+        <div class="form-row" style="margin-top:10px;">
+          <div>
+            <label class="form-label" style="font-size:0.75rem;">Latitude Exata *</label>
+            <input type="number" step="0.000001" name="latitude" id="edit_admin_lat" class="form-input" style="font-size:0.85rem; text-align:center; background:#F8FAFC;" required>
+          </div>
+          <div>
+            <label class="form-label" style="font-size:0.75rem;">Longitude Exata *</label>
+            <input type="number" step="0.000001" name="longitude" id="edit_admin_lon" class="form-input" style="font-size:0.85rem; text-align:center; background:#F8FAFC;" required>
+          </div>
+        </div>
+
+        <div style="margin-top:8px; text-align:center;">
+          <a href="#" id="edit_admin_previewMap" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem; color:#2563EB; text-decoration:underline;">
+            Abrir e conferir localização exata no Google Maps
+          </a>
+        </div>
+      </div>
+
+      <!-- Credenciais de Acesso -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit_admin_email">E-mail de Acesso *</label>
+          <input type="email" name="email" id="edit_admin_email" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_admin_senha">Redefinir Palavra-passe (Opcional)</label>
+          <input type="text" name="senha" id="edit_admin_senha" class="form-input" placeholder="Preencha apenas para alterar">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-table-action" onclick="document.getElementById('editAdminPharmacyModal').style.display='none'">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-gps-action">
+          <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Salvar Alterações Administrativas</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

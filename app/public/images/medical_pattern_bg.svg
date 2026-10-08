@@ -1,0 +1,393 @@
+
+<svg width="2400" height="1600" viewBox="0 0 2400 1600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo Sólido Cerúleo Clínico -->
+  <rect x="0" y="0" width="2400" height="1600" fill="#6895B0"/>
+  
+  <!-- Grid de Linhas Médicas Minimalistas -->
+  <g opacity="0.88">
+    
+  <g transform="translate(220, 180) rotate(-15) scale(0.95)">
+    <!-- Olivas e arco biauricular -->
+    <circle cx="-35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <path d="M -35 -55 C -35 -15, -15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 35 -55 C 35 -15, 15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <!-- Tubo central com laço poético fluido -->
+    <path d="M 0 35 C 0 70, 50 110, 80 80 C 110 50, 40 30, 20 100 C 0 170, 100 210, 130 180" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Cápsula / Diafragma -->
+    <circle cx="130" cy="180" r="16" fill="none" stroke="#FFFFFF" stroke-width="3.5"/>
+    <circle cx="130" cy="180" r="7" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(640, 120) rotate(75) scale(0.9)">
+    <!-- Haste e ponta sensora -->
+    <path d="M 0 0 L 80 0 C 95 0, 110 12, 110 26 C 110 40, 95 52, 80 52 L 0 52 C -25 52, -45 40, -55 26 C -45 12, -25 0, 0 0 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Ponta fina metálica -->
+    <path d="M -55 26 L -90 26" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Visor digital LCD -->
+    <rect x="25" y="16" width="36" height="20" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>
+    <text x="43" y="30" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">36.5</text>
+    <!-- Botão de ligar -->
+    <circle cx="75" cy="26" r="4.5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(940, 140) rotate(-120) scale(0.95)">
+    <!-- Corpo do frasco -->
+    <path d="M -18 35 C -18 10, -10 6, -8 0 L -8 -10 L 8 -10 L 8 0 C 10 6, 18 10, 18 35 C 18 45, 12 50, 0 50 C -12 50, -18 45, -18 35 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Tampa / Gargalo -->
+    <rect x="-10" y="-16" width="20" height="6" rx="2" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <!-- Gota em suspensão -->
+    <circle cx="0" cy="65" r="3.5" fill="#FFFFFF"/>
+  </g>
+
+  <g transform="translate(1120, 160) rotate(45) scale(0.85)">
+    <ellipse cx="-20" cy="0" rx="18" ry="10" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+    <path d="M -2 0 C 15 0, 30 10, 50 12" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(1450, 130) rotate(60) scale(0.95)">
+    <!-- Contorno arredondado -->
+    <rect x="-55" y="-22" width="110" height="44" rx="22" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <!-- Almofada central perfurada -->
+    <rect x="-20" y="-18" width="40" height="36" rx="4" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="2,3"/>
+    <!-- Pontilhado de microporos nas abas -->
+    <circle cx="-38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+
+  <g transform="translate(1820, 100) rotate(0) scale(0.95)">
+    <!-- Haste e ponta sensora -->
+    <path d="M 0 0 L 80 0 C 95 0, 110 12, 110 26 C 110 40, 95 52, 80 52 L 0 52 C -25 52, -45 40, -55 26 C -45 12, -25 0, 0 0 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Ponta fina metálica -->
+    <path d="M -55 26 L -90 26" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Visor digital LCD -->
+    <rect x="25" y="16" width="36" height="20" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>
+    <text x="43" y="30" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">36.5</text>
+    <!-- Botão de ligar -->
+    <circle cx="75" cy="26" r="4.5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(2160, 180) rotate(-15) scale(0.9)">
+    <!-- Pílula 1 inferior -->
+    <ellipse cx="0" cy="14" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Pílula 2 média -->
+    <ellipse cx="4" cy="4" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Pílula 3 topo -->
+    <ellipse cx="8" cy="-6" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Ranhura divisória central -->
+    <line x1="-8" y1="-6" x2="24" y2="-6" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(160, 480) rotate(25) scale(0.95)">
+    <rect x="-35" y="-18" width="70" height="36" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <line x1="0" y1="-18" x2="0" y2="18" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(540, 520) rotate(45) scale(0.9)">
+    <!-- Olivas e arco biauricular -->
+    <circle cx="-35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <path d="M -35 -55 C -35 -15, -15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 35 -55 C 35 -15, 15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <!-- Tubo central com laço poético fluido -->
+    <path d="M 0 35 C 0 70, 50 110, 80 80 C 110 50, 40 30, 20 100 C 0 170, 100 210, 130 180" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Cápsula / Diafragma -->
+    <circle cx="130" cy="180" r="16" fill="none" stroke="#FFFFFF" stroke-width="3.5"/>
+    <circle cx="130" cy="180" r="7" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(980, 440) rotate(-35) scale(0.95)">
+    <!-- Corpo transparente cilíndrico -->
+    <rect x="0" y="-14" width="90" height="28" rx="4" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Traços graduados de dosagem -->
+    <line x1="20" y1="-14" x2="20" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="35" y1="-14" x2="35" y2="-7" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="50" y1="-14" x2="50" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="65" y1="-14" x2="65" y2="-7" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="80" y1="-14" x2="80" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <!-- Ponta e cânula com agulha -->
+    <path d="M 90 -6 L 105 -6 L 105 6 L 90 6 Z" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <line x1="105" y1="0" x2="155" y2="0" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- Haste e êmbolo -->
+    <line x1="0" y1="0" x2="-35" y2="0" stroke="#FFFFFF" stroke-width="3"/>
+    <line x1="-35" y1="-18" x2="-35" y2="18" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Abas de apoio para dedos -->
+    <line x1="0" y1="-24" x2="0" y2="24" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(1340, 480) rotate(-40) scale(0.9)">
+    <rect x="-35" y="-18" width="70" height="36" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <line x1="0" y1="-18" x2="0" y2="18" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(1720, 480) rotate(-20) scale(0.95)">
+    <!-- Olivas e arco biauricular -->
+    <circle cx="-35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <path d="M -35 -55 C -35 -15, -15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 35 -55 C 35 -15, 15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <!-- Tubo central com laço poético fluido -->
+    <path d="M 0 35 C 0 70, 50 110, 80 80 C 110 50, 40 30, 20 100 C 0 170, 100 210, 130 180" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Cápsula / Diafragma -->
+    <circle cx="130" cy="180" r="16" fill="none" stroke="#FFFFFF" stroke-width="3.5"/>
+    <circle cx="130" cy="180" r="7" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(2220, 460) rotate(15) scale(0.9)">
+    <!-- Haste e ponta sensora -->
+    <path d="M 0 0 L 80 0 C 95 0, 110 12, 110 26 C 110 40, 95 52, 80 52 L 0 52 C -25 52, -45 40, -55 26 C -45 12, -25 0, 0 0 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Ponta fina metálica -->
+    <path d="M -55 26 L -90 26" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Visor digital LCD -->
+    <rect x="25" y="16" width="36" height="20" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>
+    <text x="43" y="30" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">36.5</text>
+    <!-- Botão de ligar -->
+    <circle cx="75" cy="26" r="4.5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(260, 800) rotate(-10) scale(0.95)">
+    <!-- Pílula 1 inferior -->
+    <ellipse cx="0" cy="14" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Pílula 2 média -->
+    <ellipse cx="4" cy="4" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Pílula 3 topo -->
+    <ellipse cx="8" cy="-6" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Ranhura divisória central -->
+    <line x1="-8" y1="-6" x2="24" y2="-6" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(460, 820) rotate(30) scale(0.85)">
+    <ellipse cx="-20" cy="0" rx="18" ry="10" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+    <path d="M -2 0 C 15 0, 30 10, 50 12" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(700, 800) rotate(-100) scale(0.95)">
+    <!-- Corpo do frasco -->
+    <path d="M -18 35 C -18 10, -10 6, -8 0 L -8 -10 L 8 -10 L 8 0 C 10 6, 18 10, 18 35 C 18 45, 12 50, 0 50 C -12 50, -18 45, -18 35 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Tampa / Gargalo -->
+    <rect x="-10" y="-16" width="20" height="6" rx="2" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <!-- Gota em suspensão -->
+    <circle cx="0" cy="65" r="3.5" fill="#FFFFFF"/>
+  </g>
+
+  <g transform="translate(1080, 840) rotate(80) scale(0.95)">
+    <!-- Haste e ponta sensora -->
+    <path d="M 0 0 L 80 0 C 95 0, 110 12, 110 26 C 110 40, 95 52, 80 52 L 0 52 C -25 52, -45 40, -55 26 C -45 12, -25 0, 0 0 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Ponta fina metálica -->
+    <path d="M -55 26 L -90 26" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Visor digital LCD -->
+    <rect x="25" y="16" width="36" height="20" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>
+    <text x="43" y="30" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">36.5</text>
+    <!-- Botão de ligar -->
+    <circle cx="75" cy="26" r="4.5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(1320, 860) rotate(40) scale(0.85)">
+    <ellipse cx="-20" cy="0" rx="18" ry="10" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+    <path d="M -2 0 C 15 0, 30 10, 50 12" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(1560, 840) rotate(-110) scale(0.9)">
+    <!-- Corpo do frasco -->
+    <path d="M -18 35 C -18 10, -10 6, -8 0 L -8 -10 L 8 -10 L 8 0 C 10 6, 18 10, 18 35 C 18 45, 12 50, 0 50 C -12 50, -18 45, -18 35 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Tampa / Gargalo -->
+    <rect x="-10" y="-16" width="20" height="6" rx="2" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <!-- Gota em suspensão -->
+    <circle cx="0" cy="65" r="3.5" fill="#FFFFFF"/>
+  </g>
+
+  <g transform="translate(1940, 820) rotate(55) scale(0.95)">
+    <!-- Contorno arredondado -->
+    <rect x="-55" y="-22" width="110" height="44" rx="22" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <!-- Almofada central perfurada -->
+    <rect x="-20" y="-18" width="40" height="36" rx="4" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="2,3"/>
+    <!-- Pontilhado de microporos nas abas -->
+    <circle cx="-38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+
+  <g transform="translate(2280, 840) rotate(30) scale(0.9)">
+    <rect x="-35" y="-18" width="70" height="36" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <line x1="0" y1="-18" x2="0" y2="18" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(240, 1180) rotate(35) scale(0.95)">
+    <!-- Olivas e arco biauricular -->
+    <circle cx="-35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <path d="M -35 -55 C -35 -15, -15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 35 -55 C 35 -15, 15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <!-- Tubo central com laço poético fluido -->
+    <path d="M 0 35 C 0 70, 50 110, 80 80 C 110 50, 40 30, 20 100 C 0 170, 100 210, 130 180" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Cápsula / Diafragma -->
+    <circle cx="130" cy="180" r="16" fill="none" stroke="#FFFFFF" stroke-width="3.5"/>
+    <circle cx="130" cy="180" r="7" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(680, 1140) rotate(-40) scale(0.95)">
+    <!-- Corpo transparente cilíndrico -->
+    <rect x="0" y="-14" width="90" height="28" rx="4" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Traços graduados de dosagem -->
+    <line x1="20" y1="-14" x2="20" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="35" y1="-14" x2="35" y2="-7" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="50" y1="-14" x2="50" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="65" y1="-14" x2="65" y2="-7" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="80" y1="-14" x2="80" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <!-- Ponta e cânula com agulha -->
+    <path d="M 90 -6 L 105 -6 L 105 6 L 90 6 Z" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <line x1="105" y1="0" x2="155" y2="0" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- Haste e êmbolo -->
+    <line x1="0" y1="0" x2="-35" y2="0" stroke="#FFFFFF" stroke-width="3"/>
+    <line x1="-35" y1="-18" x2="-35" y2="18" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Abas de apoio para dedos -->
+    <line x1="0" y1="-24" x2="0" y2="24" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(1120, 1180) rotate(40) scale(0.95)">
+    <rect x="-35" y="-18" width="70" height="36" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <line x1="0" y1="-18" x2="0" y2="18" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+
+  <g transform="translate(1560, 1150) rotate(-35) scale(0.95)">
+    <!-- Corpo transparente cilíndrico -->
+    <rect x="0" y="-14" width="90" height="28" rx="4" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Traços graduados de dosagem -->
+    <line x1="20" y1="-14" x2="20" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="35" y1="-14" x2="35" y2="-7" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="50" y1="-14" x2="50" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="65" y1="-14" x2="65" y2="-7" stroke="#FFFFFF" stroke-width="2"/>
+    <line x1="80" y1="-14" x2="80" y2="-4" stroke="#FFFFFF" stroke-width="2"/>
+    <!-- Ponta e cânula com agulha -->
+    <path d="M 90 -6 L 105 -6 L 105 6 L 90 6 Z" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <line x1="105" y1="0" x2="155" y2="0" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- Haste e êmbolo -->
+    <line x1="0" y1="0" x2="-35" y2="0" stroke="#FFFFFF" stroke-width="3"/>
+    <line x1="-35" y1="-18" x2="-35" y2="18" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- Abas de apoio para dedos -->
+    <line x1="0" y1="-24" x2="0" y2="24" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(1980, 1180) rotate(15) scale(0.9)">
+    <!-- Corpo do frasco -->
+    <path d="M -18 35 C -18 10, -10 6, -8 0 L -8 -10 L 8 -10 L 8 0 C 10 6, 18 10, 18 35 C 18 45, 12 50, 0 50 C -12 50, -18 45, -18 35 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Tampa / Gargalo -->
+    <rect x="-10" y="-16" width="20" height="6" rx="2" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <!-- Gota em suspensão -->
+    <circle cx="0" cy="65" r="3.5" fill="#FFFFFF"/>
+  </g>
+
+  <g transform="translate(2240, 1220) rotate(65) scale(0.95)">
+    <!-- Contorno arredondado -->
+    <rect x="-55" y="-22" width="110" height="44" rx="22" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <!-- Almofada central perfurada -->
+    <rect x="-20" y="-18" width="40" height="36" rx="4" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="2,3"/>
+    <!-- Pontilhado de microporos nas abas -->
+    <circle cx="-38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+
+  <g transform="translate(180, 1460) rotate(20) scale(0.9)">
+    <!-- Pílula 1 inferior -->
+    <ellipse cx="0" cy="14" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Pílula 2 média -->
+    <ellipse cx="4" cy="4" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Pílula 3 topo -->
+    <ellipse cx="8" cy="-6" rx="28" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <!-- Ranhura divisória central -->
+    <line x1="-8" y1="-6" x2="24" y2="-6" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(520, 1480) rotate(10) scale(0.95)">
+    <!-- Haste e ponta sensora -->
+    <path d="M 0 0 L 80 0 C 95 0, 110 12, 110 26 C 110 40, 95 52, 80 52 L 0 52 C -25 52, -45 40, -55 26 C -45 12, -25 0, 0 0 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Ponta fina metálica -->
+    <path d="M -55 26 L -90 26" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Visor digital LCD -->
+    <rect x="25" y="16" width="36" height="20" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>
+    <text x="43" y="30" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">36.5</text>
+    <!-- Botão de ligar -->
+    <circle cx="75" cy="26" r="4.5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(880, 1470) rotate(-45) scale(0.95)">
+    <!-- Contorno arredondado -->
+    <rect x="-55" y="-22" width="110" height="44" rx="22" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+    <!-- Almofada central perfurada -->
+    <rect x="-20" y="-18" width="40" height="36" rx="4" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="2,3"/>
+    <!-- Pontilhado de microporos nas abas -->
+    <circle cx="-38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="-46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="-8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="38" cy="8" r="2" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="46" cy="0" r="2" fill="#FFFFFF" opacity="0.8"/>
+  </g>
+
+  <g transform="translate(1240, 1460) rotate(-100) scale(0.95)">
+    <!-- Corpo do frasco -->
+    <path d="M -18 35 C -18 10, -10 6, -8 0 L -8 -10 L 8 -10 L 8 0 C 10 6, 18 10, 18 35 C 18 45, 12 50, 0 50 C -12 50, -18 45, -18 35 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Tampa / Gargalo -->
+    <rect x="-10" y="-16" width="20" height="6" rx="2" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+    <!-- Gota em suspensão -->
+    <circle cx="0" cy="65" r="3.5" fill="#FFFFFF"/>
+  </g>
+
+  <g transform="translate(1440, 1480) rotate(30) scale(0.85)">
+    <ellipse cx="-20" cy="0" rx="18" ry="10" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+    <path d="M -2 0 C 15 0, 30 10, 50 12" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(1820, 1460) rotate(85) scale(0.95)">
+    <!-- Haste e ponta sensora -->
+    <path d="M 0 0 L 80 0 C 95 0, 110 12, 110 26 C 110 40, 95 52, 80 52 L 0 52 C -25 52, -45 40, -55 26 C -45 12, -25 0, 0 0 Z" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Ponta fina metálica -->
+    <path d="M -55 26 L -90 26" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Visor digital LCD -->
+    <rect x="25" y="16" width="36" height="20" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>
+    <text x="43" y="30" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">36.5</text>
+    <!-- Botão de ligar -->
+    <circle cx="75" cy="26" r="4.5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(2180, 1480) rotate(-30) scale(0.9)">
+    <!-- Olivas e arco biauricular -->
+    <circle cx="-35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="35" cy="-60" r="5" fill="#FFFFFF" opacity="0.9"/>
+    <path d="M -35 -55 C -35 -15, -15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 35 -55 C 35 -15, 15 20, 0 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <!-- Tubo central com laço poético fluido -->
+    <path d="M 0 35 C 0 70, 50 110, 80 80 C 110 50, 40 30, 20 100 C 0 170, 100 210, 130 180" 
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Cápsula / Diafragma -->
+    <circle cx="130" cy="180" r="16" fill="none" stroke="#FFFFFF" stroke-width="3.5"/>
+    <circle cx="130" cy="180" r="7" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+  </g>
+  </g>
+</svg>

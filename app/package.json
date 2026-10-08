@@ -1,0 +1,30 @@
+{
+  "name": "farmalocal-pemba",
+  "version": "1.0.0",
+  "description": "Central de Disponibilidade de Medicamentos em Farmácias - UCM FGTI Pemba",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "test": "tsx test_verification.ts"
+  },
+  "keywords": ["farmacia", "medicamentos", "geolocalizacao", "gps", "haversine", "ucm", "pemba"],
+  "author": "Júnior Dicson Baulene",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.4",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "@supabase/supabase-js": "^2.49.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

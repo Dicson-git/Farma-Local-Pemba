@@ -1,0 +1,71 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="main-wrapper">
+  <div class="auth-container" style="max-width:460px;">
+    <div class="auth-header">
+      <div style="margin-bottom:12px; color:var(--primary); display:flex; justify-content:center;">
+        <svg class="ui-icon" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h1 class="auth-title">Aceder ao Painel da Farmácia</h1>
+      <p class="auth-subtitle">
+        Faça a gestão dos medicamentos disponíveis no seu balcão e mantenha o inventário atualizado em tempo real.
+      </p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error">
+        <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="email">E-mail Cadastrado</label>
+        <input type="email" name="email" id="email" class="form-input" placeholder="seu-email@farmacia.co.mz" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="senha">Palavra-passe (Senha)</label>
+        <input type="password" name="senha" id="senha" class="form-input" placeholder="Digite sua senha" required>
+      </div>
+
+      <button type="submit" class="btn-gps-action" style="width:100%; margin-top:12px;">
+        <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+        <span>Entrar no Painel</span>
+      </button>
+
+      <div style="margin-top:20px; text-align:center; font-size:0.85rem; color:#64748B;">
+        O credenciamento de novas farmácias é realizado exclusivamente pela Administração.<br>
+        É administrador? <a href="/admin/login" style="color:#2563EB; font-weight:700;">Aceder ao Portal do Administrador</a>
+      </div>
+
+      <div style="margin-top:24px; padding:12px 14px; background:#F8FAFC; border-radius:8px; font-size:0.78rem; color:#64748B; border:1px solid #E2E8F0; display:flex; gap:10px; align-items:flex-start;">
+        <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4"/>
+          <path d="M12 8h.01"/>
+        </svg>
+        <div>
+          <strong style="color:#0F172A;">Credenciais de Demonstração (Pemba):</strong><br>
+          • Central de Pemba: <code>central@farmalocal.co.mz</code> / <code>123456</code><br>
+          • Comunitária Natite: <code>natite@farmalocal.co.mz</code> / <code>123456</code>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

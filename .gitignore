@@ -1,0 +1,53 @@
+# ==============================================================================
+# FARMA LOCAL PEMBA - .gitignore
+# ==============================================================================
+
+# Dependências (Node / NPM / Yarn)
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Variáveis de Ambiente e Segredos
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+app/.env
+*.env
+!*.env.example
+
+# Logs do Sistema e Execução
+logs/
+*.log
+
+# Arquivos de Compilação e Build
+dist/
+build/
+*.tsbuildinfo
+
+# Dados Locais em Tempo de Execução
+app/data/database.json
+
+# Configurações de IDEs e Editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Arquivos Temporários de Sistema Operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Metadados e Logs de Agentes Locais
+.gemini/
+.system_generated/
