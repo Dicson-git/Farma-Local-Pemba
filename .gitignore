@@ -20,6 +20,10 @@ lerna-debug.log*
 app/.env
 *.env
 !*.env.example
+Keys
+keys
+*.key
+
 
 # Logs do Sistema e Execução
 logs/
