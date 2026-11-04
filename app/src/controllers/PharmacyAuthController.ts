@@ -108,7 +108,7 @@ export class PharmacyAuthController {
         updates.senha_hash = bcrypt.hashSync(nova_senha.trim(), salt);
       }
 
-      const updated = db.updatePharmacy(farmaciaId, updates);
+      const updated = await db.updatePharmacy(farmaciaId, updates);
       if (updated) {
         return res.redirect('/dashboard?success=perfil_atualizado');
       } else {

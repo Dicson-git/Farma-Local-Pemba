@@ -1,22 +1,32 @@
 /**
  * lib/database.ts
  * 
- * Camada de Persistência Relacional com armazenamento em memória
- * e sincronização atômica em ficheiro JSON no disco.
+ * Camada de Persistência Híbrida Write-Through:
+ * - Primário: Supabase PostgreSQL Cloud (transacional e relacional)
+ * - Cache / Contingência: Memória RAM de alta velocidade + Backup JSON em disco
  * 
- * Contém seed inicial realista com farmácias reais de Pemba (Cabo Delgado)
- * e coordenadas GPS georreferenciadas na cidade.
+ * Georreferenciamento de alta precisão em Pemba (Cabo Delgado, Moçambique).
  */
 
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { Pharmacy, MedicineStock } from '../types';
-import { getSupabaseClient, isSupabaseConfigured } from './supabase';
+import { 
+  fetchAllFromSupabase, 
+  persistPharmacy, 
+  removePharmacy, 
+  persistMedicine, 
+  removeMedicine,
+  findAdminInSupabase 
+} from './persistence';
+import { isSupabaseConfigured } from './supabase';
 
 export class DatabaseService {
   private static instance: DatabaseService;
   private dbFilePath: string;
+  private initialized: boolean = false;
 
   public farmacias: Pharmacy[] = [];
   public medicamentos: MedicineStock[] = [];
@@ -27,7 +37,7 @@ export class DatabaseService {
       fs.mkdirSync(dataDir, { recursive: true });
     }
     this.dbFilePath = path.join(dataDir, 'database.json');
-    this.loadOrSeed();
+    this.loadFromDiskOrSeed();
   }
 
   public static getInstance(): DatabaseService {
@@ -35,6 +45,35 @@ export class DatabaseService {
       DatabaseService.instance = new DatabaseService();
     }
     return DatabaseService.instance;
+  }
+
+  /**
+   * Inicialização com Hidratação do Supabase (Bootstrap da Aplicação)
+   */
+  public async init(): Promise<void> {
+    if (this.initialized) return;
+
+    console.log('[DB] Inicializando camada de persistência híbrida...');
+
+    if (isSupabaseConfigured()) {
+      try {
+        const cloudData = await fetchAllFromSupabase();
+        if (cloudData && cloudData.farmacias.length > 0) {
+          this.farmacias = cloudData.farmacias;
+          this.medicamentos = cloudData.medicamentos;
+          this.saveToDisk();
+          this.initialized = true;
+          console.log(`[SUPABASE] ✅ Hidratação concluída: ${this.farmacias.length} farmácias e ${this.medicamentos.length} medicamentos carregados da nuvem.`);
+          return;
+        }
+      } catch (err: any) {
+        console.warn(`[SUPABASE] ⚠️ Falha na hidratação em nuvem: ${err.message}. Ativando contingência local.`);
+      }
+    } else {
+      console.log('[DB] Supabase não configurado. Operando exclusivamente com base local.');
+    }
+
+    this.initialized = true;
   }
 
   private saveToDisk() {
@@ -46,43 +85,44 @@ export class DatabaseService {
       };
       fs.writeFileSync(this.dbFilePath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (err) {
-      console.error('Erro ao persistir banco de dados em disco:', err);
+      console.error('[DB] Erro ao persistir cache local em disco:', err);
     }
   }
 
-  private loadOrSeed() {
+  private loadFromDiskOrSeed() {
     if (fs.existsSync(this.dbFilePath)) {
       try {
         const raw = fs.readFileSync(this.dbFilePath, 'utf-8');
         const data = JSON.parse(raw);
-        this.farmacias = data.farmacias || [];
-        this.medicamentos = data.medicamentos || [];
-        console.log(`[DB] Dados carregados do disco: ${this.farmacias.length} farmácias, ${this.medicamentos.length} medicamentos.`);
-        return;
+        if (Array.isArray(data.farmacias) && data.farmacias.length > 0) {
+          this.farmacias = data.farmacias;
+          this.medicamentos = data.medicamentos || [];
+          console.log(`[DB] Cache local carregado: ${this.farmacias.length} farmácias, ${this.medicamentos.length} medicamentos.`);
+          return;
+        }
       } catch (e) {
-        console.warn('[DB] Ficheiro existente inválido, gerando seed...');
+        console.warn('[DB] Cache local inválido. Gerando semente inicial...');
       }
     }
 
     this.seedInitialData();
   }
 
-  private seedInitialData() {
-    console.log('[DB] Inicializando seed com farmácias e medicamentos em Pemba...');
+  public seedInitialData() {
+    console.log('[DB] Gerando seed com farmácias georreferenciadas de Pemba...');
 
     const salt = bcrypt.genSaltSync(10);
     const senhaPadrao = bcrypt.hashSync('123456', salt);
 
     // Coordenadas Reais de Bairros de Pemba (Cabo Delgado):
-    // Centro/Baixa: -12.9715, 40.5180
+    // Baixa/Centro: -12.9715, 40.5180
     // Natite: -12.9642, 40.5255
     // Alto Gingone: -12.9810, 40.5050
     // Cariacó: -12.9680, 40.5090
-    // Wimbi / Praia: -12.9960, 40.5520
 
     this.farmacias = [
       {
-        id: 'farm-001',
+        id: 'a0000000-0000-0000-0000-000000000001',
         nome: 'Farmácia Central de Pemba',
         telefone: '+258 84 321 0001',
         email: 'central@farmalocal.co.mz',
@@ -98,7 +138,7 @@ export class DatabaseService {
         atualizado_em: new Date().toISOString()
       },
       {
-        id: 'farm-002',
+        id: 'a0000000-0000-0000-0000-000000000002',
         nome: 'Farmácia Comunitária Natite',
         telefone: '+258 82 987 0002',
         email: 'natite@farmalocal.co.mz',
@@ -114,7 +154,7 @@ export class DatabaseService {
         atualizado_em: new Date().toISOString()
       },
       {
-        id: 'farm-003',
+        id: 'a0000000-0000-0000-0000-000000000003',
         nome: 'Farmácia Vida & Saúde Gingone',
         telefone: '+258 86 555 0003',
         email: 'gingone@farmalocal.co.mz',
@@ -130,7 +170,7 @@ export class DatabaseService {
         atualizado_em: new Date().toISOString()
       },
       {
-        id: 'farm-004',
+        id: 'a0000000-0000-0000-0000-000000000004',
         nome: 'Farmácia Esperança Cariacó',
         telefone: '+258 87 111 0004',
         email: 'cariaco@farmalocal.co.mz',
@@ -138,7 +178,7 @@ export class DatabaseService {
         provincia: 'Cabo Delgado',
         cidade: 'Pemba',
         bairro: 'Cariacó',
-        endereco_detalhado: 'Av. 25 de Setembro, junto ao Campo de Futebol',
+        endereco_detalhado: 'Av. 25 de Setembro, Campo de Futebol',
         horario_funcionamento: '08h00 às 20h30',
         latitude: -12.968000,
         longitude: 40.509000,
@@ -150,8 +190,8 @@ export class DatabaseService {
     this.medicamentos = [
       // Farmácia Central (Baixa)
       {
-        id: 'med-001',
-        farmacia_id: 'farm-001',
+        id: 'b0000000-0000-0000-0000-000000000001',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000001',
         nome_comercial: 'Paracetamol 500mg',
         principio_ativo: 'Paracetamol',
         dosagem: '500mg - Caixa c/ 20 Comprimidos',
@@ -161,8 +201,8 @@ export class DatabaseService {
         atualizado_em: new Date().toISOString()
       },
       {
-        id: 'med-002',
-        farmacia_id: 'farm-001',
+        id: 'b0000000-0000-0000-0000-000000000002',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000001',
         nome_comercial: 'Amoxicilina 500mg',
         principio_ativo: 'Amoxicilina Tri-hidratada',
         dosagem: '500mg - Caixa c/ 21 Cápsulas',
@@ -172,8 +212,8 @@ export class DatabaseService {
         atualizado_em: new Date().toISOString()
       },
       {
-        id: 'med-003',
-        farmacia_id: 'farm-001',
+        id: 'b0000000-0000-0000-0000-000000000003',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000001',
         nome_comercial: 'Coartem (Antimalárico)',
         principio_ativo: 'Arteméter + Lumefantrina',
         dosagem: '20/120mg - Cartela c/ 24 Comprimidos',
@@ -182,22 +222,11 @@ export class DatabaseService {
         criado_em: new Date().toISOString(),
         atualizado_em: new Date().toISOString()
       },
-      {
-        id: 'med-004',
-        farmacia_id: 'farm-001',
-        nome_comercial: 'Ibuprofeno 400mg',
-        principio_ativo: 'Ibuprofeno',
-        dosagem: '400mg - Caixa c/ 20 Comprimidos',
-        quantidade_stock: 25,
-        preco: 110.00,
-        criado_em: new Date().toISOString(),
-        atualizado_em: new Date().toISOString()
-      },
 
       // Farmácia Natite
       {
-        id: 'med-005',
-        farmacia_id: 'farm-002',
+        id: 'b0000000-0000-0000-0000-000000000004',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000002',
         nome_comercial: 'Paracetamol 500mg',
         principio_ativo: 'Paracetamol',
         dosagem: '500mg - Blister c/ 10 Comprimidos',
@@ -207,19 +236,8 @@ export class DatabaseService {
         atualizado_em: new Date().toISOString()
       },
       {
-        id: 'med-006',
-        farmacia_id: 'farm-002',
-        nome_comercial: 'Amoxicilina Pediátrica',
-        principio_ativo: 'Amoxicilina',
-        dosagem: '250mg/5ml - Suspensão Oral 100ml',
-        quantidade_stock: 6,
-        preco: 180.00,
-        criado_em: new Date().toISOString(),
-        atualizado_em: new Date().toISOString()
-      },
-      {
-        id: 'med-007',
-        farmacia_id: 'farm-002',
+        id: 'b0000000-0000-0000-0000-000000000005',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000002',
         nome_comercial: 'Coartem Pediátrico',
         principio_ativo: 'Arteméter + Lumefantrina',
         dosagem: '20/120mg - 6 Comprimidos Dispersíveis',
@@ -228,22 +246,11 @@ export class DatabaseService {
         criado_em: new Date().toISOString(),
         atualizado_em: new Date().toISOString()
       },
-      {
-        id: 'med-008',
-        farmacia_id: 'farm-002',
-        nome_comercial: 'SRO (Sais Reidratação Oral)',
-        principio_ativo: 'Eletrólitos + Glicose',
-        dosagem: 'Saqueta p/ 1 Litro de Água',
-        quantidade_stock: 50,
-        preco: 25.00,
-        criado_em: new Date().toISOString(),
-        atualizado_em: new Date().toISOString()
-      },
 
       // Farmácia Gingone
       {
-        id: 'med-009',
-        farmacia_id: 'farm-003',
+        id: 'b0000000-0000-0000-0000-000000000006',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000003',
         nome_comercial: 'Paracetamol Xarope',
         principio_ativo: 'Paracetamol',
         dosagem: '120mg/5ml - Frasco 100ml',
@@ -253,8 +260,8 @@ export class DatabaseService {
         atualizado_em: new Date().toISOString()
       },
       {
-        id: 'med-010',
-        farmacia_id: 'farm-003',
+        id: 'b0000000-0000-0000-0000-000000000007',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000003',
         nome_comercial: 'Omeprazol 20mg',
         principio_ativo: 'Omeprazol',
         dosagem: '20mg - Frasco c/ 28 Cápsulas',
@@ -263,38 +270,16 @@ export class DatabaseService {
         criado_em: new Date().toISOString(),
         atualizado_em: new Date().toISOString()
       },
-      {
-        id: 'med-011',
-        farmacia_id: 'farm-003',
-        nome_comercial: 'Ciprofloxacina 500mg',
-        principio_ativo: 'Cloridrato de Ciprofloxacina',
-        dosagem: '500mg - Caixa c/ 10 Comprimidos',
-        quantidade_stock: 5,
-        preco: 210.00,
-        criado_em: new Date().toISOString(),
-        atualizado_em: new Date().toISOString()
-      },
 
-      // Farmácia Cariacó
+      // Farmácia Cariacó (com stock 0 para validação de omissão RN-01)
       {
-        id: 'med-012',
-        farmacia_id: 'farm-004',
-        nome_comercial: 'Paracetamol 500mg',
-        principio_ativo: 'Paracetamol',
-        dosagem: '500mg - Caixa c/ 20 Comprimidos',
-        quantidade_stock: 3, // Stock baixo
-        preco: 55.00,
-        criado_em: new Date().toISOString(),
-        atualizado_em: new Date().toISOString()
-      },
-      {
-        id: 'med-013',
-        farmacia_id: 'farm-004',
+        id: 'b0000000-0000-0000-0000-000000000008',
+        farmacia_id: 'a0000000-0000-0000-0000-000000000004',
         nome_comercial: 'Amoxicilina 500mg',
         principio_ativo: 'Amoxicilina',
-        dosagem: '500mg - 20 Cápsulas',
-        quantidade_stock: 0, // ESGOTADO (não deve aparecer para o paciente, RN-01)
-        preco: 215.00,
+        dosagem: '500mg - 20 Comprimidos',
+        quantidade_stock: 0,
+        preco: 210.00,
         criado_em: new Date().toISOString(),
         atualizado_em: new Date().toISOString()
       }
@@ -303,7 +288,10 @@ export class DatabaseService {
     this.saveToDisk();
   }
 
-  // --- MÉTODOS DE FARMÁCIAS E ADMINISTRAÇÃO ---
+  // ============================================================================
+  // MÉTODOS DE CONSULTA (Leitura em Cache de Alta Velocidade)
+  // ============================================================================
+
   public getAllPharmacies(): Pharmacy[] {
     return [...this.farmacias];
   }
@@ -316,19 +304,57 @@ export class DatabaseService {
     return this.farmacias.find(f => f.id === id);
   }
 
-  public addPharmacy(farmaciaData: Omit<Pharmacy, 'id' | 'criado_em' | 'atualizado_em'>): Pharmacy {
+  public getMedicinesCountByPharmacy(farmaciaId: string): number {
+    return this.medicamentos.filter(m => m.farmacia_id === farmaciaId).length;
+  }
+
+  public getMedicinesByPharmacy(farmaciaId: string): MedicineStock[] {
+    return this.medicamentos.filter(m => m.farmacia_id === farmaciaId);
+  }
+
+  public searchAvailableMedicines(termo?: string): Array<{ medicamento: MedicineStock; farmacia: Pharmacy }> {
+    const termoClean = (termo || '').trim().toLowerCase();
+
+    return this.medicamentos
+      .filter(m => {
+        // Regra RN-01: Não exibir se quantidade_stock for <= 0
+        if (m.quantidade_stock <= 0) return false;
+        if (!termoClean) return true;
+
+        const matchNome = m.nome_comercial.toLowerCase().includes(termoClean);
+        const matchPrincipio = (m.principio_ativo || '').toLowerCase().includes(termoClean);
+        return matchNome || matchPrincipio;
+      })
+      .map(medicamento => {
+        const farmacia = this.farmacias.find(f => f.id === medicamento.farmacia_id)!;
+        return { medicamento, farmacia };
+      })
+      .filter(item => Boolean(item.farmacia));
+  }
+
+  // ============================================================================
+  // MÉTODOS DE ESCRITA WRITE-THROUGH (Supabase First -> Memória -> Disco)
+  // ============================================================================
+
+  public async addPharmacy(farmaciaData: Omit<Pharmacy, 'id' | 'criado_em' | 'atualizado_em'>): Promise<Pharmacy> {
     const novaFarmacia: Pharmacy = {
       ...farmaciaData,
-      id: 'farm-' + Date.now().toString(36),
+      id: crypto.randomUUID(),
       criado_em: new Date().toISOString(),
       atualizado_em: new Date().toISOString()
     };
+
+    // 1. Gravar primeiro no Supabase
+    await persistPharmacy(novaFarmacia);
+
+    // 2. Atualizar estado local
     this.farmacias.push(novaFarmacia);
     this.saveToDisk();
+
     return novaFarmacia;
   }
 
-  public updatePharmacy(id: string, updates: Partial<Pharmacy>): Pharmacy | null {
+  public async updatePharmacy(id: string, updates: Partial<Pharmacy>): Promise<Pharmacy | null> {
     const farmacia = this.farmacias.find(f => f.id === id);
     if (!farmacia) return null;
 
@@ -345,31 +371,138 @@ export class DatabaseService {
     if (updates.longitude !== undefined && !isNaN(updates.longitude)) farmacia.longitude = parseFloat(updates.longitude.toFixed(6));
     farmacia.atualizado_em = new Date().toISOString();
 
+    // 1. Gravar atualização no Supabase
+    await persistPharmacy(farmacia);
+
+    // 2. Atualizar cache em disco
     this.saveToDisk();
+
     return farmacia;
   }
 
-  public deletePharmacy(id: string): boolean {
+  public async deletePharmacy(id: string): Promise<boolean> {
     const idx = this.farmacias.findIndex(f => f.id === id);
     if (idx === -1) return false;
 
-    // Remove farmácia
+    // 1. Remover do Supabase (o Postgres cascateia para medicine_stocks)
+    await removePharmacy(id);
+
+    // 2. Atualizar coleções locais
     this.farmacias.splice(idx, 1);
-
-    // Remoção em cascata dos medicamentos pertencentes a esta farmácia
     this.medicamentos = this.medicamentos.filter(m => m.farmacia_id !== id);
-
     this.saveToDisk();
+
     return true;
   }
 
-  public getMedicinesCountByPharmacy(farmaciaId: string): number {
-    return this.medicamentos.filter(m => m.farmacia_id === farmaciaId).length;
+  public async addMedicine(medicineData: Omit<MedicineStock, 'id' | 'criado_em' | 'atualizado_em'>): Promise<MedicineStock> {
+    const nomeLimpo = medicineData.nome_comercial.trim().toLowerCase();
+    const duplicado = this.medicamentos.find(
+      m => m.farmacia_id === medicineData.farmacia_id && m.nome_comercial.trim().toLowerCase() === nomeLimpo
+    );
+
+    if (duplicado) {
+      throw new Error(`MEDICINE_NAME_DUPLICATED: Já existe um medicamento com o nome comercial '${medicineData.nome_comercial.trim()}' no estoque desta farmácia.`);
+    }
+
+    const novoMedicamento: MedicineStock = {
+      ...medicineData,
+      id: crypto.randomUUID(),
+      criado_em: new Date().toISOString(),
+      atualizado_em: new Date().toISOString()
+    };
+
+    // 1. Gravar primeiro no Supabase
+    await persistMedicine(novoMedicamento);
+
+    // 2. Atualizar estado local
+    this.medicamentos.push(novoMedicamento);
+    this.saveToDisk();
+
+    return novoMedicamento;
   }
 
-  public validateAdmin(email: string, senha: string): { success: boolean; admin?: { id: string; nome: string; email: string } } {
+  public async updateMedicineStock(id: string, farmaciaId: string, updates: Partial<MedicineStock>): Promise<MedicineStock | null> {
+    const item = this.medicamentos.find(m => m.id === id && m.farmacia_id === farmaciaId);
+    if (!item) return null;
+
+    if (updates.nome_comercial !== undefined) item.nome_comercial = updates.nome_comercial.trim();
+    if (updates.principio_ativo !== undefined) item.principio_ativo = updates.principio_ativo.trim();
+    if (updates.dosagem !== undefined) item.dosagem = updates.dosagem.trim();
+    if (updates.quantidade_stock !== undefined) {
+      item.quantidade_stock = Math.max(0, updates.quantidade_stock);
+    }
+    if (updates.preco !== undefined) {
+      item.preco = Math.max(0, updates.preco);
+    }
+    item.atualizado_em = new Date().toISOString();
+
+    // 1. Gravar no Supabase
+    await persistMedicine(item);
+
+    // 2. Atualizar cache em disco
+    this.saveToDisk();
+
+    return item;
+  }
+
+  public async decrementMedicineStock(id: string, farmaciaId: string, amount: number = 1): Promise<MedicineStock | null> {
+    const item = this.medicamentos.find(m => m.id === id && m.farmacia_id === farmaciaId);
+    if (!item) return null;
+
+    item.quantidade_stock = Math.max(0, item.quantidade_stock - amount);
+    item.atualizado_em = new Date().toISOString();
+
+    // 1. Gravar no Supabase
+    await persistMedicine(item);
+
+    // 2. Atualizar cache em disco
+    this.saveToDisk();
+
+    return item;
+  }
+
+  public async deleteMedicine(id: string, farmaciaId: string): Promise<boolean> {
+    const idx = this.medicamentos.findIndex(m => m.id === id && m.farmacia_id === farmaciaId);
+    if (idx >= 0) {
+      // 1. Remover do Supabase
+      await removeMedicine(id);
+
+      // 2. Atualizar cache local
+      this.medicamentos.splice(idx, 1);
+      this.saveToDisk();
+      return true;
+    }
+    return false;
+  }
+
+  // ============================================================================
+  // AUTENTICAÇÃO DO ADMINISTRADOR
+  // ============================================================================
+
+  public async validateAdmin(email: string, senha: string): Promise<{ success: boolean; admin?: { id: string; nome: string; email: string } }> {
     const adminEmail = 'admin@farmalocal.co.mz';
-    if (email.trim().toLowerCase() === adminEmail.toLowerCase() && (senha === 'admin123' || senha === 'admin')) {
+    const emailLimpo = email.trim().toLowerCase();
+
+    // Validação primária no Supabase
+    const adminCloud = await findAdminInSupabase(emailLimpo);
+    if (adminCloud) {
+      const match = bcrypt.compareSync(senha, adminCloud.senha_hash);
+      if (match) {
+        return {
+          success: true,
+          admin: {
+            id: adminCloud.id,
+            nome: adminCloud.nome,
+            email: adminCloud.email
+          }
+        };
+      }
+      return { success: false };
+    }
+
+    // Fallback de contingência local
+    if (emailLimpo === adminEmail && (senha === 'admin123' || senha === 'admin')) {
       return {
         success: true,
         admin: {
@@ -379,134 +512,45 @@ export class DatabaseService {
         }
       };
     }
+
     return { success: false };
   }
 
-  // --- MÉTODOS DE MEDICAMENTOS ---
-  public getMedicinesByPharmacy(farmaciaId: string): MedicineStock[] {
-    return this.medicamentos.filter(m => m.farmacia_id === farmaciaId);
-  }
+  // ============================================================================
+  // SINCRONIZAÇÃO EM MASSA (Bulk Sync para o Painel Admin)
+  // ============================================================================
 
-  public addMedicine(medicineData: Omit<MedicineStock, 'id' | 'criado_em' | 'atualizado_em'>): MedicineStock {
-    const novoMedicamento: MedicineStock = {
-      ...medicineData,
-      id: 'med-' + Date.now().toString(36),
-      criado_em: new Date().toISOString(),
-      atualizado_em: new Date().toISOString()
-    };
-    this.medicamentos.push(novoMedicamento);
-    this.saveToDisk();
-    return novoMedicamento;
-  }
-
-  public updateMedicineStock(id: string, farmaciaId: string, updates: Partial<MedicineStock>): MedicineStock | null {
-    const item = this.medicamentos.find(m => m.id === id && m.farmacia_id === farmaciaId);
-    if (!item) return null;
-
-    if (updates.nome_comercial !== undefined) item.nome_comercial = updates.nome_comercial;
-    if (updates.principio_ativo !== undefined) item.principio_ativo = updates.principio_ativo;
-    if (updates.dosagem !== undefined) item.dosagem = updates.dosagem;
-    if (updates.quantidade_stock !== undefined) {
-      item.quantidade_stock = Math.max(0, updates.quantidade_stock);
-    }
-    if (updates.preco !== undefined) {
-      item.preco = Math.max(0, updates.preco);
-    }
-    item.atualizado_em = new Date().toISOString();
-
-    this.saveToDisk();
-    return item;
-  }
-
-  public decrementMedicineStock(id: string, farmaciaId: string, amount: number = 1): MedicineStock | null {
-    const item = this.medicamentos.find(m => m.id === id && m.farmacia_id === farmaciaId);
-    if (!item) return null;
-
-    item.quantidade_stock = Math.max(0, item.quantidade_stock - amount);
-    item.atualizado_em = new Date().toISOString();
-    this.saveToDisk();
-    return item;
-  }
-
-  public deleteMedicine(id: string, farmaciaId: string): boolean {
-    const idx = this.medicamentos.findIndex(m => m.id === id && m.farmacia_id === farmaciaId);
-    if (idx >= 0) {
-      this.medicamentos.splice(idx, 1);
-      this.saveToDisk();
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Busca medicamentos em estoque ativo (RN-01: quantidade_stock > 0)
-   */
-  public searchAvailableMedicines(termo?: string): Array<{ medicamento: MedicineStock; farmacia: Pharmacy }> {
-    const termoClean = (termo || '').trim().toLowerCase();
-
-    return this.medicamentos
-      .filter(m => {
-        // Regra RN-01: Não exibir se stock for 0
-        if (m.quantidade_stock <= 0) return false;
-
-        if (!termoClean) return true; // Retorna todos disponíveis se vazio
-
-        const matchNome = m.nome_comercial.toLowerCase().includes(termoClean);
-        const matchPrincipio = m.principio_ativo.toLowerCase().includes(termoClean);
-        return matchNome || matchPrincipio;
-      })
-      .map(medicamento => {
-        const farmacia = this.farmacias.find(f => f.id === medicamento.farmacia_id)!;
-        return { medicamento, farmacia };
-      })
-      .filter(item => !!item.farmacia);
-  }
-
-  // --- MÉTODOS DE INTEGRAÇÃO SUPABASE ---
   public async syncWithSupabase(): Promise<{ success: boolean; message: string }> {
     if (!isSupabaseConfigured()) {
       return {
         success: false,
-        message: 'Supabase não configurado. Defina as variáveis no arquivo .env para habilitar sincronização em nuvem.'
+        message: 'Supabase não configurado no arquivo .env.'
       };
-    }
-
-    const client = getSupabaseClient();
-    if (!client) {
-      return { success: false, message: 'Falha ao inicializar cliente Supabase.' };
     }
 
     try {
-      // 1. Sincronizar farmácias para o Supabase (Upsert)
+      let fCount = 0;
+      let mCount = 0;
+
       for (const f of this.farmacias) {
-        await client.from('pharmacies').upsert({
-          nome: f.nome,
-          telefone: f.telefone,
-          email: f.email,
-          senha_hash: f.senha_hash,
-          provincia: f.provincia,
-          cidade: f.cidade,
-          bairro: f.bairro,
-          endereco_detalhado: f.endereco_detalhado,
-          horario_funcionamento: f.horario_funcionamento,
-          latitude: f.latitude,
-          longitude: f.longitude,
-          atualizado_em: f.atualizado_em
-        }, { onConflict: 'email' });
+        const ok = await persistPharmacy(f);
+        if (ok) fCount++;
       }
 
-      console.log(`[SUPABASE] ${this.farmacias.length} farmácias sincronizadas com sucesso com o banco em nuvem.`);
+      for (const m of this.medicamentos) {
+        const ok = await persistMedicine(m);
+        if (ok) mCount++;
+      }
+
       return {
         success: true,
-        message: `Sincronização concluída: ${this.farmacias.length} farmácias sincronizadas no Supabase.`
+        message: `Sincronização concluída: ${fCount} farmácias e ${mCount} medicamentos salvos no Supabase.`
       };
     } catch (err: any) {
-      console.error('[SUPABASE] Erro durante a sincronização:', err);
       return {
         success: false,
-        message: `Erro ao sincronizar com Supabase: ${err.message}`
+        message: `Erro na sincronização em massa: ${err.message}`
       };
     }
   }
 }
-

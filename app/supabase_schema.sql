@@ -194,16 +194,16 @@ INSERT INTO public.admins (nome, email, senha_hash)
 VALUES (
     'Administrador Central FarmaLocal',
     'admin@farmalocal.co.mz',
-    '$2a$10$w0f5uK5q.v8uA6v7t3O4yeB3QJm8q3xYv4pZ1p8s9vQ2a3b4c5d6e'
+    '$2b$10$g0zmFhLigMsoPlmrCbApUu16sZ/vWMWUZ8BgNMUBC4EdD9cbt0fYW'
 ) ON CONFLICT (email) DO NOTHING;
 
--- Farmácias Físicas de Pemba
+-- Farmácias Físicas de Pemba (Senha: 123456 via bcrypt)
 INSERT INTO public.pharmacies (id, nome, telefone, email, senha_hash, provincia, cidade, bairro, endereco_detalhado, horario_funcionamento, latitude, longitude)
 VALUES 
-    ('a0000000-0000-0000-0000-000000000001', 'Farmácia Central de Pemba', '+258 84 321 0001', 'central@farmalocal.co.mz', '$2a$10$w0f5uK5q.v8uA6v7t3O4yeB3QJm8q3xYv4pZ1p8s9vQ2a3b4c5d6e', 'Cabo Delgado', 'Pemba', 'Baixa / Centro', 'Av. Eduardo Mondlane, Próximo ao Porto', '07h30 às 21h00', -12.971500, 40.518000),
-    ('a0000000-0000-0000-0000-000000000002', 'Farmácia Comunitária Natite', '+258 82 987 0002', 'natite@farmalocal.co.mz', '$2a$10$w0f5uK5q.v8uA6v7t3O4yeB3QJm8q3xYv4pZ1p8s9vQ2a3b4c5d6e', 'Cabo Delgado', 'Pemba', 'Natite', 'Rua do Mercado de Natite, Parada Principal', '08h00 às 20h00', -12.964200, 40.525500),
-    ('a0000000-0000-0000-0000-000000000003', 'Farmácia Vida & Saúde Gingone', '+258 86 555 0003', 'gingone@farmalocal.co.mz', '$2a$10$w0f5uK5q.v8uA6v7t3O4yeB3QJm8q3xYv4pZ1p8s9vQ2a3b4c5d6e', 'Cabo Delgado', 'Pemba', 'Alto Gingone', 'Rotunda do Alto Gingone, Estrada N1', '08h00 às 22h00', -12.981000, 40.505000),
-    ('a0000000-0000-0000-0000-000000000004', 'Farmácia Esperança Cariacó', '+258 87 111 0004', 'cariaco@farmalocal.co.mz', '$2a$10$w0f5uK5q.v8uA6v7t3O4yeB3QJm8q3xYv4pZ1p8s9vQ2a3b4c5d6e', 'Cabo Delgado', 'Pemba', 'Cariacó', 'Av. 25 de Setembro, Campo de Futebol', '08h00 às 20h30', -12.968000, 40.509000)
+    ('a0000000-0000-0000-0000-000000000001', 'Farmácia Central de Pemba', '+258 84 321 0001', 'central@farmalocal.co.mz', '$2b$10$uO9t9vVGU6WKzub.66xwWO.49ux5iyJnYU0hOi/J5uPOINTRDkRIO', 'Cabo Delgado', 'Pemba', 'Baixa / Centro', 'Av. Eduardo Mondlane, Próximo ao Porto', '07h30 às 21h00', -12.971500, 40.518000),
+    ('a0000000-0000-0000-0000-000000000002', 'Farmácia Comunitária Natite', '+258 82 987 0002', 'natite@farmalocal.co.mz', '$2b$10$uO9t9vVGU6WKzub.66xwWO.49ux5iyJnYU0hOi/J5uPOINTRDkRIO', 'Cabo Delgado', 'Pemba', 'Natite', 'Rua do Mercado de Natite, Parada Principal', '08h00 às 20h00', -12.964200, 40.525500),
+    ('a0000000-0000-0000-0000-000000000003', 'Farmácia Vida & Saúde Gingone', '+258 86 555 0003', 'gingone@farmalocal.co.mz', '$2b$10$uO9t9vVGU6WKzub.66xwWO.49ux5iyJnYU0hOi/J5uPOINTRDkRIO', 'Cabo Delgado', 'Pemba', 'Alto Gingone', 'Rotunda do Alto Gingone, Estrada N1', '08h00 às 22h00', -12.981000, 40.505000),
+    ('a0000000-0000-0000-0000-000000000004', 'Farmácia Esperança Cariacó', '+258 87 111 0004', 'cariaco@farmalocal.co.mz', '$2b$10$uO9t9vVGU6WKzub.66xwWO.49ux5iyJnYU0hOi/J5uPOINTRDkRIO', 'Cabo Delgado', 'Pemba', 'Cariacó', 'Av. 25 de Setembro, Campo de Futebol', '08h00 às 20h30', -12.968000, 40.509000)
 ON CONFLICT (email) DO NOTHING;
 
 -- Medicamentos Iniciais em Stock

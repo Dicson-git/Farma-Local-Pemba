@@ -28,6 +28,19 @@
         </svg>
         <span>Cadastrar Nova Farmácia</span>
       </button>
+
+      <!-- Botão de Sincronização Manual com Supabase -->
+      <form method="POST" action="/admin/sync" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').textContent='Sincronizando...'">
+        <button type="submit" class="nav-btn nav-btn-outline" id="btn-sync-supabase" style="color:#0284C7; border-color:#BAE6FD; display:flex; align-items:center; gap:6px;" title="Sincronizar todas as farmácias com o Supabase">
+          <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          <span>Sincronizar Supabase</span>
+        </button>
+      </form>
+
       <a href="/admin/logout" class="nav-btn nav-btn-outline" style="color:#EF4444; border-color:#FCA5A5;">
         <svg class="ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -48,9 +61,13 @@
       </svg>
       <span>
         <% if (success === 'farmacia_cadastrada') { %>
-          Farmácia cadastrada com sucesso com localização exata e credenciais ativas!
+          Farmácia cadastrada com sucesso e sincronizada com o Supabase!
         <% } else if (success === 'farmacia_removida') { %>
-          Farmácia e respetivo inventário de medicamentos removidos com sucesso do sistema.
+          Farmácia e respetivo inventário de medicamentos removidos com sucesso do sistema e do Supabase.
+        <% } else if (success === 'farmacia_atualizada') { %>
+          Farmácia atualizada com sucesso e sincronizada com o Supabase.
+        <% } else if (success && success.startsWith('sync_ok:')) { %>
+          ✅ <%= success.replace('sync_ok:', '') %>
         <% } else { %>
           Operação administrativa realizada com sucesso.
         <% } %>
@@ -72,6 +89,8 @@
           Erro: As coordenadas GPS (Latitude e Longitude) são obrigatórias e devem refletir a localização exata da farmácia física.
         <% } else if (error === 'campos_obrigatorios') { %>
           Erro: Preencha todos os campos obrigatórios da farmácia.
+        <% } else if (error && error.startsWith('sync_erro:')) { %>
+          ⚠️ Falha na sincronização: <%= error.replace('sync_erro:', '') %>
         <% } else { %>
           <%= error %>
         <% } %>

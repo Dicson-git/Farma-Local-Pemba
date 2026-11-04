@@ -24,7 +24,7 @@ export class AdminController {
     }
 
     const db = DatabaseService.getInstance();
-    const result = db.validateAdmin(email, senha);
+    const result = await db.validateAdmin(email, senha);
 
     if (!result.success) {
       return res.render('pages/admin_login', {
@@ -111,7 +111,7 @@ export class AdminController {
       const salt = bcrypt.genSaltSync(10);
       const senha_hash = bcrypt.hashSync(senha, salt);
 
-      db.addPharmacy({
+      await db.addPharmacy({
         nome: nome.trim(),
         telefone: telefone.trim(),
         email: email.trim().toLowerCase(),
@@ -132,12 +132,12 @@ export class AdminController {
     }
   }
 
-  public static deletePharmacy(req: Request, res: Response) {
+  public static async deletePharmacy(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const db = DatabaseService.getInstance();
       
-      const removed = db.deletePharmacy(id);
+      const removed = await db.deletePharmacy(id);
       if (removed) {
         return res.redirect('/admin?success=farmacia_removida');
       } else {
@@ -151,7 +151,7 @@ export class AdminController {
 
   public static async updatePharmacy(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const {
         nome,
         telefone,
@@ -206,7 +206,7 @@ export class AdminController {
         updates.senha_hash = bcrypt.hashSync(senha.trim(), salt);
       }
 
-      const updated = db.updatePharmacy(id, updates);
+      const updated = await db.updatePharmacy(id, updates);
       if (updated) {
         return res.redirect('/admin?success=farmacia_atualizada');
       } else {
@@ -217,4 +217,25 @@ export class AdminController {
       res.redirect('/admin?error=erro_servidor');
     }
   }
+
+  /**
+   * Sincronização manual (bulk) de todas as farmácias locais com o Supabase.
+   * Rota: POST /admin/sync
+   */
+  public static async syncAll(req: Request, res: Response) {
+    try {
+      const db = DatabaseService.getInstance();
+      const resultado = await db.syncWithSupabase();
+
+      if (resultado.success) {
+        return res.redirect(`/admin?success=${encodeURIComponent('sync_ok:' + resultado.message)}`);
+      } else {
+        return res.redirect(`/admin?error=${encodeURIComponent('sync_erro:' + resultado.message)}`);
+      }
+    } catch (err: any) {
+      console.error('Erro ao executar sincronização manual com Supabase:', err);
+      res.redirect('/admin?error=erro_servidor');
+    }
+  }
 }
+

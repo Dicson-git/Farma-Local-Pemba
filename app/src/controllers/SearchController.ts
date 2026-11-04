@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { DatabaseService } from '../lib/database';
+import { MedicineStockModel, PharmacyModel } from '../models';
 import { calculateDistanceKm, formatDistance } from '../lib/haversine';
 import { SearchResultItem } from '../types';
 
@@ -13,8 +13,7 @@ export class SearchController {
     const userLon = req.query.lon ? parseFloat(req.query.lon as string) : null;
     const isAjax = req.xhr || req.headers.accept?.includes('application/json');
 
-    const db = DatabaseService.getInstance();
-    const availableItems = db.searchAvailableMedicines(q);
+    const availableItems = MedicineStockModel.searchAvailable(q);
 
     let results: SearchResultItem[] = availableItems.map(({ medicamento, farmacia }) => {
       let distancia_km = 0;
@@ -57,7 +56,7 @@ export class SearchController {
     }
 
     const currentPharmacyId = req.cookies?.farmacia_session;
-    const currentPharmacy = currentPharmacyId ? db.findPharmacyById(currentPharmacyId) : null;
+    const currentPharmacy = currentPharmacyId ? PharmacyModel.findById(currentPharmacyId) : null;
 
     res.render('pages/index', {
       title: 'FarmaLocal Pemba | Central de Disponibilidade de Medicamentos',
